@@ -3,10 +3,15 @@ package com.seuprojeto.model;
 import com.app.sistema_de_moeda.models.Instituicao;
 import com.app.sistema_de_moeda.models.Usuario;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "aluno")
+@Getter
+@Setter
 public class Aluno {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
