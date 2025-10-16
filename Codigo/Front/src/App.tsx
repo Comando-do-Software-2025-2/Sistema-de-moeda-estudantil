@@ -7,6 +7,11 @@ import Index from "./pages/Index";
 import CadastroUsuario from "./pages/CadastroUsuario";
 import NotFound from "./pages/NotFound";
 import CadastroAluno from "./pages/CadastroAluno";
+import ListaUsuarios from "./pages/ListaUsuarios";
+import EditarUsuario from "./pages/EditarUsuario";
+import ListaEmpresas from "./pages/ListaEmpresas";
+import EditarEmpresa from "./pages/EditarEmpresa";
+
 
 const queryClient = new QueryClient();
 
@@ -21,6 +26,11 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="/cadastro-usuario" element={<CadastroUsuario />} />
           <Route path="/cadastro-aluno" element={<CadastroAluno />} />
+          <Route path="/lista-usuarios" element={<ListaUsuarios />} />
+          <Route path="/editar-usuario/:id" element={<EditarUsuario />} />
+          <Route path="/lista-empresas" element={<ListaEmpresas />} />
+          <Route path="/editar-empresa/:id" element={<EditarEmpresa />} />
+          {/* CATCH-ALL ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -1,9 +1,11 @@
 import { AlunoForm } from "@/components/AlunoForm";
+import { Navbar } from "@/components/Navbar";
 import { GraduationCap, Sparkles, Coins } from "lucide-react";
 
 const CadastroAluno = () => {
   return (
     <div className="min-h-screen relative overflow-hidden">
+      <Navbar />
       {/* Video Background */}
       <div className="fixed inset-0 z-0">
         <video
@@ -23,7 +25,7 @@ const CadastroAluno = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-12">
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-12 pt-24">
         {/* Header */}
         <div className="text-center mb-12 animate-fade-in-up">
           <div className="flex items-center justify-center gap-3 mb-4">
