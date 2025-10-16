@@ -1,8 +1,32 @@
 import { UsuarioForm } from "@/components/UsuarioForm";
 import { Navbar } from "@/components/Navbar";
-import { UserPlus, Sparkles } from "lucide-react";
+import { UserPlus, Sparkles, Coins, Gift, BarChart2 } from "lucide-react";
 
 const CadastroUsuario = () => {
+  const infoCards = [
+    {
+      title: "Alunos",
+      description:
+        "Acumule moedas pelo seu desempenho acadêmico e troque por vantagens",
+      icon: <Coins className="h-6 w-6" />,
+      gradient: "from-amber-400/25 to-amber-200/10",
+    },
+    {
+      title: "Professores",
+      description:
+        "Reconheça e recompense o mérito dos seus alunos com moedas",
+      icon: <Gift className="h-6 w-6" />,
+      gradient: "from-pink-400/25 to-violet-300/8",
+    },
+    {
+      title: "Empresas",
+      description:
+        "Ofereça vantagens e benefícios aos estudantes participantes",
+      icon: <BarChart2 className="h-6 w-6" />,
+      gradient: "from-sky-400/20 to-emerald-200/8",
+    },
+  ];
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       <Navbar />
@@ -15,10 +39,7 @@ const CadastroUsuario = () => {
           playsInline
           className="w-full h-full object-cover"
         >
-          <source
-            src="/fundo.mp4"
-            type="video/mp4"
-          />
+          <source src="/fundo.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
         <div className="absolute inset-0 bg-black/30" />
@@ -56,9 +77,9 @@ const CadastroUsuario = () => {
                 Preencha seus dados para criar sua conta no sistema
               </p>
             </div>
-            
+
             <UsuarioForm />
-            
+
             <div className="mt-8 pt-8 border-t border-white/20">
               <p className="text-sm text-white/70 text-center">
                 Ao se cadastrar, você concorda com nossos termos de uso e política de privacidade
@@ -67,29 +88,49 @@ const CadastroUsuario = () => {
           </div>
         </div>
 
-        {/* Info Cards */}
-        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mt-12 animate-fade-in">
-          {[
-            {
-              title: "Alunos",
-              description: "Acumule moedas pelo seu desempenho acadêmico e troque por vantagens",
-            },
-            {
-              title: "Professores",
-              description: "Reconheça e recompense o mérito dos seus alunos com moedas",
-            },
-            {
-              title: "Empresas",
-              description: "Ofereça vantagens e benefícios aos estudantes participantes",
-            },
-          ].map((item, index) => (
+        {/* Info Cards - estilo igual ao CadastroAluno (mais animado e diferente) */}
+        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mt-12 w-full">
+          {infoCards.map((item, index) => (
             <div
               key={index}
-              className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 hover:border-white/40 transition-all duration-300 hover:shadow-xl"
-              style={{ animationDelay: `${index * 100}ms` }}
+              className={`group relative overflow-hidden rounded-xl p-6 border border-white/10 transform transition-all duration-350 will-change-transform
+                bg-gradient-to-br ${item.gradient} backdrop-blur-sm hover:shadow-2xl hover:-translate-y-3 hover:scale-105`}
+              style={{
+                animationDelay: `${index * 100}ms`,
+                animationName: "fadeUp",
+                animationDuration: "420ms",
+                animationFillMode: "both",
+              }}
             >
-              <h3 className="text-lg font-semibold text-white mb-2">{item.title}</h3>
-              <p className="text-sm text-white/80">{item.description}</p>
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-white/10 ring-1 ring-white/6 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">
+                    <div className="text-white">{item.icon}</div>
+                  </div>
+                </div>
+
+                <div className="min-w-0">
+                  <h3 className="text-lg font-semibold text-white mb-1 flex items-center gap-2">
+                    {item.title}
+                    <span className="inline-flex items-center justify-center text-xs px-2 py-0.5 bg-white/6 rounded-full text-white/90">
+                      Novo
+                    </span>
+                  </h3>
+                  <p className="text-sm text-white/80 leading-relaxed">{item.description}</p>
+
+                  <div className="mt-4 flex items-center gap-3 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                    <button className="px-3 py-1 rounded-lg bg-white/6 text-white text-sm hover:bg-white/10 transition">
+                      Saiba mais
+                    </button>
+                    <button className="px-3 py-1 rounded-lg bg-amber-400/10 text-amber-300 text-sm hover:bg-amber-400/20 transition">
+                      Resgatar
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* playful accent shape */}
+              <div className="pointer-events-none absolute -right-8 -top-8 w-36 h-36 rounded-full bg-white/4 blur-sm opacity-30 transform rotate-45 group-hover:opacity-40 transition-all duration-500" />
             </div>
           ))}
         </div>
