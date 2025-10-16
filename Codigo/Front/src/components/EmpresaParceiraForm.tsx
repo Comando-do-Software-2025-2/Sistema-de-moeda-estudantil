@@ -126,7 +126,7 @@ export function EmpresaParceiraForm() {
           <Input
             id="nomeEmpresa"
             placeholder="Ex: Restaurante Universitário"
-            className="pl-10 h-12 bg-white/20 backdrop-blur-sm border-white/30 text-white placeholder:text-white/60"
+            className="pl-10 h-12 bg-white/50 backdrop-blur-sm border-white/60 text-white placeholder:text-white/90"
             {...register("nomeEmpresa")}
           />
         </div>
@@ -144,7 +144,7 @@ export function EmpresaParceiraForm() {
           <Input
             id="cnpj"
             placeholder="00.000.000/0000-00"
-            className="pl-10 h-12 bg-white/20 backdrop-blur-sm border-white/30 text-white placeholder:text-white/60"
+            className="pl-10 h-12 bg-white/30 backdrop-blur-sm border-white/40 text-white placeholder:text-white/70"
             {...register("cnpj")}
             onChange={(e) => {
               e.target.value = formatarCNPJ(e.target.value);
@@ -165,7 +165,7 @@ export function EmpresaParceiraForm() {
           <Textarea
             id="descricao"
             placeholder="Descreva os produtos e serviços oferecidos pela sua empresa..."
-            className="pl-10 min-h-[120px] bg-white/20 backdrop-blur-sm border-white/30 resize-none text-white placeholder:text-white/60"
+            className="pl-10 min-h-[120px] bg-white/30 backdrop-blur-sm border-white/40 resize-none text-white placeholder:text-white/70"
             {...register("descricao")}
           />
         </div>
