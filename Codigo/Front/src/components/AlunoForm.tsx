@@ -13,11 +13,47 @@ import { GraduationCap, Hash, MapPin, Building2, BookOpen, Search, User } from "
 interface Usuario {
   id: number;
   nome: string;
-  cpf: string;
   email: string;
+  tipoUsuario: string;
 }
 
+// Validação de CPF brasileiro
+const validarCPF = (cpf: string): boolean => {
+  cpf = cpf.replace(/[^\d]/g, "");
+
+  if (cpf.length !== 11) return false;
+  if (/^(\d)\1+$/.test(cpf)) return false;
+
+  let soma = 0;
+  let resto;
+
+  for (let i = 1; i <= 9; i++) {
+    soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+  }
+
+  resto = (soma * 10) % 11;
+  if (resto === 10 || resto === 11) resto = 0;
+  if (resto !== parseInt(cpf.substring(9, 10))) return false;
+
+  soma = 0;
+  for (let i = 1; i <= 10; i++) {
+    soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+  }
+
+  resto = (soma * 10) % 11;
+  if (resto === 10 || resto === 11) resto = 0;
+  if (resto !== parseInt(cpf.substring(10, 11))) return false;
+
+  return true;
+};
+
 const alunoSchema = z.object({
+  cpf: z
+    .string()
+    .min(11, "CPF inválido")
+    .max(14, "CPF inválido")
+    .refine(validarCPF, "CPF inválido")
+    .transform((val) => val.replace(/[^\d]/g, "")),
   ra: z
     .string()
     .min(5, "RA deve ter no mínimo 5 caracteres")
@@ -28,7 +64,7 @@ const alunoSchema = z.object({
   }).min(1, "Selecione uma instituição"),
   endereco: z
     .string()
-    .min(10, "Endereço deve ter no mínimo 10 caracteres")
+    .min(6, "Endereço deve ter no mínimo 6 caracteres")
     .max(200, "Endereço deve ter no máximo 200 caracteres")
     .trim(),
   curso: z
@@ -64,6 +100,15 @@ export function AlunoForm({ usuarioId }: AlunoFormProps) {
     resolver: zodResolver(alunoSchema),
   });
 
+  const formatarCPF = (valor: string): string => {
+    const numeros = valor.replace(/[^\d]/g, "");
+    return numeros
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d{1,2})$/, "$1-$2")
+      .slice(0, 14);
+  };
+
   const formatarRA = (valor: string): string => {
     // RA aceita números e letras, mantém apenas alfanuméricos
     return valor.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(0, 20);
@@ -79,20 +124,20 @@ export function AlunoForm({ usuarioId }: AlunoFormProps) {
     setIsSearching(true);
     try {
       // Aqui você faria a chamada real para a API
-      // const response = await fetch(`/api/usuarios/alunos?search=${termo}`);
+      // const response = await fetch(`/api/usuarios?search=${termo}&tipo=Aluno`);
       // const data = await response.json();
       
       // Simulação de dados para exemplo
       await new Promise((resolve) => setTimeout(resolve, 500));
       
       const usuariosMock: Usuario[] = [
-        { id: 1, nome: "João da Silva", cpf: "123.456.789-00", email: "joao@email.com" },
-        { id: 2, nome: "Maria Santos", cpf: "987.654.321-00", email: "maria@email.com" },
-        { id: 3, nome: "Pedro Oliveira", cpf: "456.789.123-00", email: "pedro@email.com" },
+        { id: 1, nome: "João da Silva", email: "joao@email.com", tipoUsuario: "Aluno" },
+        { id: 2, nome: "Maria Santos", email: "maria@email.com", tipoUsuario: "Aluno" },
+        { id: 3, nome: "Pedro Oliveira", email: "pedro@email.com", tipoUsuario: "Aluno" },
       ].filter(
         (u) =>
-          u.nome.toLowerCase().includes(termo.toLowerCase()) ||
-          u.cpf.includes(termo)
+          u.nome.toLowerCase().includes(termo.toLowerCase()) &&
+          u.tipoUsuario === "Aluno"
       );
 
       setUsuarios(usuariosMock);
@@ -115,13 +160,22 @@ export function AlunoForm({ usuarioId }: AlunoFormProps) {
   };
 
   const onSubmit = async (data: AlunoFormData) => {
+    if (!usuarioSelecionado) {
+      toast({
+        title: "Usuário não selecionado",
+        description: "Por favor, selecione um usuário cadastrado antes de continuar.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {
       // Aqui você implementaria a lógica de salvamento no backend
       const alunoData = {
         ...data,
-        usuarioId: usuarioSelecionado?.id || usuarioId || null,
+        usuarioId: usuarioSelecionado.id,
         saldoMoedas: 0.00, // Saldo inicial
       };
       
@@ -156,13 +210,16 @@ export function AlunoForm({ usuarioId }: AlunoFormProps) {
       {/* Campo de Pesquisa de Usuário */}
       <div className="space-y-2">
         <Label htmlFor="searchUsuario" className="text-base text-white">
-          Buscar Usuário (Aluno)
+          Buscar Usuário Cadastrado
         </Label>
+        <p className="text-sm text-white/70 mb-2">
+          Para cadastrar um aluno, primeiro selecione o usuário já cadastrado no sistema
+        </p>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/60" />
           <Input
             id="searchUsuario"
-            placeholder="Digite o nome ou CPF do aluno"
+            placeholder="Digite o nome do usuário"
             className="pl-10 h-12 bg-white/30 backdrop-blur-sm border-white/40 text-white placeholder:text-white/70"
             value={searchTerm}
             onChange={(e) => {
@@ -192,7 +249,7 @@ export function AlunoForm({ usuarioId }: AlunoFormProps) {
                   <User className="h-4 w-4 text-gray-600" />
                   <div>
                     <p className="font-medium text-gray-900">{usuario.nome}</p>
-                    <p className="text-sm text-gray-600">CPF: {usuario.cpf}</p>
+                    <p className="text-sm text-gray-600">{usuario.email}</p>
                   </div>
                 </div>
               </button>
@@ -202,19 +259,19 @@ export function AlunoForm({ usuarioId }: AlunoFormProps) {
 
         {showResults && usuarios.length === 0 && (
           <p className="text-sm text-white/70 bg-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/30">
-            Nenhum usuário encontrado com tipo "Aluno"
+            Nenhum usuário encontrado. Certifique-se de que o usuário está cadastrado no sistema.
           </p>
         )}
 
         {/* Usuário Selecionado */}
         {usuarioSelecionado && (
-          <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4 border border-white/30">
+          <div className="bg-green-500/20 backdrop-blur-sm rounded-lg p-4 border border-green-400/30">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-white">
                 <User className="h-5 w-5" />
                 <div>
                   <p className="font-medium">{usuarioSelecionado.nome}</p>
-                  <p className="text-sm text-white/70">CPF: {usuarioSelecionado.cpf}</p>
+                  <p className="text-sm text-white/70">{usuarioSelecionado.email}</p>
                 </div>
               </div>
               <Button
@@ -232,6 +289,27 @@ export function AlunoForm({ usuarioId }: AlunoFormProps) {
               </Button>
             </div>
           </div>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="cpf" className="text-base text-white">
+          CPF
+        </Label>
+        <div className="relative">
+          <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/60" />
+          <Input
+            id="cpf"
+            placeholder="000.000.000-00"
+            className="pl-10 h-12 bg-white/30 backdrop-blur-sm border-white/40 text-white placeholder:text-white/70"
+            {...register("cpf")}
+            onChange={(e) => {
+              e.target.value = formatarCPF(e.target.value);
+            }}
+          />
+        </div>
+        {errors.cpf && (
+          <p className="text-sm text-red-300 animate-fade-in">{errors.cpf.message}</p>
         )}
       </div>
 

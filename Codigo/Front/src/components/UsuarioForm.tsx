@@ -7,37 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { User, Mail, Lock, Hash, UserCircle } from "lucide-react";
-
-// Validação de CPF brasileiro
-const validarCPF = (cpf: string): boolean => {
-  cpf = cpf.replace(/[^\d]/g, "");
-
-  if (cpf.length !== 11) return false;
-  if (/^(\d)\1+$/.test(cpf)) return false;
-
-  let soma = 0;
-  let resto;
-
-  for (let i = 1; i <= 9; i++) {
-    soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
-  }
-
-  resto = (soma * 10) % 11;
-  if (resto === 10 || resto === 11) resto = 0;
-  if (resto !== parseInt(cpf.substring(9, 10))) return false;
-
-  soma = 0;
-  for (let i = 1; i <= 10; i++) {
-    soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
-  }
-
-  resto = (soma * 10) % 11;
-  if (resto === 10 || resto === 11) resto = 0;
-  if (resto !== parseInt(cpf.substring(10, 11))) return false;
-
-  return true;
-};
+import { User, Mail, Lock, UserCircle } from "lucide-react";
 
 const usuarioSchema = z.object({
   nome: z
@@ -60,12 +30,6 @@ const usuarioSchema = z.object({
     .regex(/[a-z]/, "Senha deve conter pelo menos uma letra minúscula")
     .regex(/[0-9]/, "Senha deve conter pelo menos um número"),
   confirmarSenha: z.string(),
-  cpf: z
-    .string()
-    .min(11, "CPF inválido")
-    .max(14, "CPF inválido")
-    .refine(validarCPF, "CPF inválido")
-    .transform((val) => val.replace(/[^\d]/g, "")),
   tipoUsuario: z.enum(["Aluno", "Professor", "Empresa", "Administrador"], {
     required_error: "Selecione o tipo de usuário",
   }),
@@ -90,15 +54,6 @@ export function UsuarioForm() {
   } = useForm<UsuarioFormData>({
     resolver: zodResolver(usuarioSchema),
   });
-
-  const formatarCPF = (valor: string): string => {
-    const numeros = valor.replace(/[^\d]/g, "");
-    return numeros
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d{1,2})$/, "$1-$2")
-      .slice(0, 14);
-  };
 
   const onSubmit = async (data: UsuarioFormData) => {
     setIsSubmitting(true);
@@ -164,27 +119,6 @@ export function UsuarioForm() {
         </div>
         {errors.email && (
           <p className="text-sm text-red-300 animate-fade-in">{errors.email.message}</p>
-        )}
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="cpf" className="text-base text-white">
-          CPF
-        </Label>
-        <div className="relative">
-          <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/60" />
-          <Input
-            id="cpf"
-            placeholder="000.000.000-00"
-            className="pl-10 h-12 bg-white/30 backdrop-blur-sm border-white/40 text-white placeholder:text-white/70"
-            {...register("cpf")}
-            onChange={(e) => {
-              e.target.value = formatarCPF(e.target.value);
-            }}
-          />
-        </div>
-        {errors.cpf && (
-          <p className="text-sm text-red-300 animate-fade-in">{errors.cpf.message}</p>
         )}
       </div>
 
