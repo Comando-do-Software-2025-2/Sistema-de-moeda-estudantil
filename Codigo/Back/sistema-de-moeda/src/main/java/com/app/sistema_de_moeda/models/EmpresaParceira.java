@@ -2,18 +2,21 @@ package com.app.sistema_de_moeda.models;
 
 import com.app.sistema_de_moeda.models.Usuario;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "empresa_parceiras")
+@Getter
+@Setter
 public class EmpresaParceira {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "usuario_id", nullable = false)
-    private Usuario usuario;
+    @Column(nullable = false)
+    private String nome;
 
     @Column(nullable = false, length = 18)
     private String cnpj;
@@ -23,8 +26,8 @@ public class EmpresaParceira {
 
     public EmpresaParceira() {}
 
-    public EmpresaParceira(Usuario usuario, String cnpj, String descricao) {
-        this.usuario = usuario;
+    public EmpresaParceira(String nome, String cnpj, String descricao) {
+        this.nome = nome;
         this.cnpj = cnpj;
         this.descricao = descricao;
     }
