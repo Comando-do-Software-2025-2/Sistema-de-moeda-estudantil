@@ -1,10 +1,13 @@
 package com.app.sistema_de_moeda.controllers;
 
+import com.app.sistema_de_moeda.dtos.AlunoDto;
 import com.app.sistema_de_moeda.services.AlunoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/alunos")
@@ -30,12 +33,13 @@ public class AlunoController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deletarAluno(@PathVariable Long id) {
-        return ResponseEntity.ok(alunoService.deletarAluno(id));
+        alunoService.deletarAluno(id);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<AlunoDto> editarAluno(@PathVariable Long id, @RequestBody AlunoDto alunoDto) {
-        alunoService.editarAluno(id, alunoDto);
+        return ResponseEntity.ok(alunoService.editarAluno(id, alunoDto));
     }
 
 }

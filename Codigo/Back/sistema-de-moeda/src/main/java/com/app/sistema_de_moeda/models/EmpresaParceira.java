@@ -4,7 +4,7 @@ import com.app.sistema_de_moeda.models.Usuario;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "empresas_parceiras")
+@Table(name = "empresa_parceiras")
 public class EmpresaParceira {
 
     @Id
