@@ -30,7 +30,8 @@ public class UsuarioService {
         Usuario usuario = new Usuario(
                 usuarioDto.nome(),
                 usuarioDto.email(),
-                usuarioDto.senha()
+                usuarioDto.senha(),
+                usuarioDto.tipoUsuario()
         );
         usuarioRepository.save(usuario);
     }
@@ -57,9 +58,10 @@ public class UsuarioService {
 
     private UsuarioDto toDto(Usuario usuario) {
         return new UsuarioDto(
-                usuario.nome(),
-                usuario.email(),
-                usuario.enha()
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getSenha(),
+                usuario.getTipoUsuario()
         );
     }
 }
