@@ -1,4 +1,4 @@
-package com.seuprojeto.model;
+package com.app.sistema_de_moeda.models;
 
 import com.app.sistema_de_moeda.models.Instituicao;
 import com.app.sistema_de_moeda.models.Usuario;
