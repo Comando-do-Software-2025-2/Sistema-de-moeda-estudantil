@@ -1,6 +1,8 @@
 package com.app.sistema_de_moeda.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,14 +15,22 @@ public class Instituicao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @NotBlank
     private String nome;
 
-    @Column(length = 14)
+    @NotBlank
+    @Size(max = 14)
     private String cnpj;
 
-    @Column
+    @NotBlank
     private String endereco;
 
+    public Instituicao() {}
+
+    public Instituicao(String nome, String cnpj, String endereco) {
+        this.nome = nome;
+        this.cnpj = cnpj;
+        this.endereco = endereco;
+    }
 
 }

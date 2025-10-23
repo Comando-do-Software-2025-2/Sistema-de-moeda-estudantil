@@ -2,6 +2,8 @@ package com.app.sistema_de_moeda.models;
 
 import com.app.sistema_de_moeda.models.Usuario;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,14 +16,14 @@ public class EmpresaParceira {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 18)
+    @NotBlank
+    @Size(max = 14)
     private String cnpj;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
-
-    @Column(columnDefinition = "TEXT")
+    
     private String descricao;
 
     public EmpresaParceira() {}
