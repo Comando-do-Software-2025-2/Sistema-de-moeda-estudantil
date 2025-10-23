@@ -2,6 +2,10 @@ package com.app.sistema_de_moeda.models;
 
 import com.app.sistema_de_moeda.enums.TipoTransacao;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,30 +20,38 @@ public class Transacao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     private TipoTransacao tipoTransacao;
 
-    @ManyToOne(optional = false)
+    @NotNull
+    @ManyToOne
     @JoinColumn(name = "professor_id")
     private Professor professor;
 
-    @ManyToOne(optional = false)
+    @NotNull
+    @ManyToOne
     @JoinColumn(name = "aluno_id")
     private Aluno aluno;
 
-    @ManyToOne(optional = false)
+    @NotNull
+    @ManyToOne
     @JoinColumn(name = "vantagem_id")
     private Vantagem vantagem;
 
+    @NotNull
+    @Positive(message = "O valor da transação deve ser positivo")
     private BigDecimal valorEmMoedas;
 
-    @Column
+    @NotBlank(message = "O motivo não pode ser vazio")
     private String motivo;
 
-    @Column
+    @NotBlank(message = "O código de validação não pode ser vazio")
     private String codigoValidacao;
 
+    @PastOrPresent
     private LocalDateTime dataTransacao;
+
 
     public Transacao() {}
 
