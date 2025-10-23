@@ -3,6 +3,7 @@ package com.app.sistema_de_moeda.controllers;
 import com.app.sistema_de_moeda.dtos.InstituicaoDto;
 import com.app.sistema_de_moeda.dtos.ProfessorDto;
 import com.app.sistema_de_moeda.models.Instituicao;
+import com.app.sistema_de_moeda.models.Professor;
 import com.app.sistema_de_moeda.services.ProfessorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,12 +26,12 @@ public class ProfessorController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Instituicao>> buscarProfessores() {
+    public ResponseEntity<List<Professor>> buscarProfessores() {
         return ResponseEntity.ok(professorService.buscarProfessores());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Instituicao> buscarProfessorPeloId(@PathVariable Long id) {
+    public ResponseEntity<Professor> buscarProfessorPeloId(@PathVariable Long id) {
         return ResponseEntity.ok(professorService.buscarProfessorPeloId(id));
     }
 

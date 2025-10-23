@@ -16,7 +16,7 @@ import java.util.List;
 public class ProfessorService {
     private final ProfessorRepository professorRepository;
 
-    public Professor buscarPeloId(Long id) {
+    public Professor buscarProfessorPeloId(Long id) {
         return professorRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Instituição não encontrada."));
     }
 
@@ -27,17 +27,17 @@ public class ProfessorService {
     }
 
     public void deletarPeloId(Long id) {
-        if (buscarPeloId(id) != null) {
+        if (buscarProfessorPeloId(id) != null) {
             professorRepository.deleteById(id);
         }
     }
 
-    public List<Professor> buscarInstituicoes() {
-        List<Professor> instituicoes = professorRepository.findAll();
-        if (instituicoes.isEmpty()) {
+    public List<Professor> buscarProfessores() {
+        List<Professor> professores = professorRepository.findAll();
+        if (professores.isEmpty()) {
             throw new EntityNotFoundException("Não há instituições cadastradas");
         }
-        return instituicoes;
+        return professores;
     }
 
 }
