@@ -27,7 +27,7 @@ public class ProfessorService {
     public void criarProfessor(ProfessorDto professorDto) {
         Usuario usuario = usuarioService.buscarUsuario(professorDto.usuario_id());
         Instituicao instituicao = instituicaoService.buscarPeloId(professorDto.instituicao_id());
-        
+
         Professor professor = new Professor(usuario, instituicao,
                 professorDto.departamento(), professorDto.cpf());
         professorRepository.save(professor);
