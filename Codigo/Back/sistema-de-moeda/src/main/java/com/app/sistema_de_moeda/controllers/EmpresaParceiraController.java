@@ -1,6 +1,7 @@
 package com.app.sistema_de_moeda.controllers;
 
 import com.app.sistema_de_moeda.dtos.EmpresaParceiraDto;
+import com.app.sistema_de_moeda.models.EmpresaParceira;
 import com.app.sistema_de_moeda.services.EmpresaParceiraService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,7 @@ public class EmpresaParceiraController {
     private final EmpresaParceiraService empresaParceiraService;
 
     @GetMapping
-    public ResponseEntity<List<EmpresaParceiraDto>> buscarEmpresas() {
+    public ResponseEntity<List<EmpresaParceira>> buscarEmpresas() {
         return ResponseEntity.ok(empresaParceiraService.buscarEmpresas());
     }
 
@@ -27,7 +28,7 @@ public class EmpresaParceiraController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EmpresaParceiraDto> buscarEmpresa(@PathVariable Long id) {
+    public ResponseEntity<EmpresaParceira> buscarEmpresa(@PathVariable Long id) {
         return ResponseEntity.ok(empresaParceiraService.buscarEmpresa(id));
     }
 
@@ -38,7 +39,7 @@ public class EmpresaParceiraController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EmpresaParceiraDto> editarEmpresa(@PathVariable Long id, @RequestBody EmpresaParceiraDto empresaDto) {
+    public ResponseEntity<EmpresaParceira> editarEmpresa(@PathVariable Long id, @RequestBody EmpresaParceiraDto empresaDto) {
         return ResponseEntity.ok(empresaParceiraService.editarEmpresa(id, empresaDto));
     }
 }

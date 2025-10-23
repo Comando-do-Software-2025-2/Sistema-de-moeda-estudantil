@@ -5,12 +5,10 @@ import com.app.sistema_de_moeda.models.Usuario;
 
 import java.math.BigDecimal;
 
-public record AlunoDto(
+public record ProfessorDto(
         Usuario usuario,
         Instituicao instituicao,
-        String rg,
-        String endereco,
-        String curso,
+        String departamento,
         String cpf,
         BigDecimal saldoMoedas
 ) {

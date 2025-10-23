@@ -1,7 +1,9 @@
 package com.app.sistema_de_moeda.dtos;
 
+import com.app.sistema_de_moeda.models.Usuario;
+
 public record EmpresaParceiraDto(
-        String nome,
+        Usuario usuario,
         String cnpj,
         String descricao
 ) {

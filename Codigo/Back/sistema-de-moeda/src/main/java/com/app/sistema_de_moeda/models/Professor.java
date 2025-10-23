@@ -1,8 +1,11 @@
-package com.seuprojeto.model;
+package com.app.sistema_de_moeda.models;
 
 import com.app.sistema_de_moeda.models.Instituicao;
 import com.app.sistema_de_moeda.models.Usuario;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,23 +20,25 @@ public class Professor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @NotNull
+    @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
-    @ManyToOne(optional = false)
+    @NotNull
+    @ManyToOne
     @JoinColumn(name = "instituicao_id", nullable = false)
     private Instituicao instituicao;
 
-    @Column(length = 100)
+    @Size(max = 100)
     private String departamento;
 
-    @Column(length = 14)
+    @Size(max = 14)
     private String cpf;
 
-    @Column(name = "saldo_moedas", precision = 10, scale = 2)
+    @NotNull
+    @Digits(integer = 8, fraction = 2)
     private BigDecimal saldoMoedas;
-
 
     public Professor() {}
 
