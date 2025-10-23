@@ -2,6 +2,7 @@ package com.app.sistema_de_moeda.services;
 
 import com.app.sistema_de_moeda.dtos.EmpresaParceiraDto;
 import com.app.sistema_de_moeda.models.EmpresaParceira;
+import com.app.sistema_de_moeda.models.Usuario;
 import com.app.sistema_de_moeda.repositories.EmpresaParceiraRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,13 +14,15 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class EmpresaParceiraService {
     private final EmpresaParceiraRepository empresaParceiraRepository;
+    private final UsuarioService usuarioService;
 
     public List<EmpresaParceira> buscarEmpresas() {
         return empresaParceiraRepository.findAll();
     }
 
     public void criarEmpresa(EmpresaParceiraDto empresaDto) {
-        EmpresaParceira empresa = new EmpresaParceira(empresaDto.usuario(), empresaDto.cnpj(), empresaDto.descricao());
+        Usuario usuario = usuarioService.buscarUsuario(empresaDto.usuario_id());
+        EmpresaParceira empresa = new EmpresaParceira(usuario, empresaDto.cnpj(), empresaDto.descricao());
         empresaParceiraRepository.save(empresa);
     }
 
@@ -37,8 +40,10 @@ public class EmpresaParceiraService {
         EmpresaParceira empresa = empresaParceiraRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Empresa não encontrada"));
 
-        empresa.setUsuario(empresa.getUsuario());
-        empresa.setDescricao(empresa.getDescricao());
+        Usuario usuario = usuarioService.buscarUsuario(empresaDto.usuario_id());
+
+        empresa.setUsuario(usuario);
+        empresa.setDescricao(empresaDto.descricao());
         empresa.setCnpj(empresaDto.cnpj());
 
         empresaParceiraRepository.save(empresa);
