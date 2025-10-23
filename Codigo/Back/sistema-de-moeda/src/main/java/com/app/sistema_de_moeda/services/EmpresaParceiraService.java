@@ -21,8 +21,7 @@ public class EmpresaParceiraService {
     }
 
     public void criarEmpresa(EmpresaParceiraDto empresaDto) {
-        Usuario usuario = usuarioService.buscarUsuario(empresaDto.usuario_id());
-        EmpresaParceira empresa = new EmpresaParceira(usuario, empresaDto.cnpj(), empresaDto.descricao());
+        EmpresaParceira empresa = new EmpresaParceira(empresaDto.nomeEmpresa(), empresaDto.cnpj(), empresaDto.descricao());
         empresaParceiraRepository.save(empresa);
     }
 
@@ -40,9 +39,8 @@ public class EmpresaParceiraService {
         EmpresaParceira empresa = empresaParceiraRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Empresa não encontrada"));
 
-        Usuario usuario = usuarioService.buscarUsuario(empresaDto.usuario_id());
 
-        empresa.setUsuario(usuario);
+        empresa.setNomeEmpresa(empresaDto.nomeEmpresa());
         empresa.setDescricao(empresaDto.descricao());
         empresa.setCnpj(empresaDto.cnpj());
 

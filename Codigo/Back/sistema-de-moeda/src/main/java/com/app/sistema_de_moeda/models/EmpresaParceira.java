@@ -20,6 +20,9 @@ public class EmpresaParceira {
     @Size(max = 14)
     private String cnpj;
 
+    @NotBlank
+    private String nomeEmpresa;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
@@ -28,10 +31,10 @@ public class EmpresaParceira {
 
     public EmpresaParceira() {}
 
-    public EmpresaParceira(Usuario usuario, String cnpj, String descricao) {
+    public EmpresaParceira(String nomeEmpresa, String cnpj, String descricao) {
         this.cnpj = cnpj;
         this.descricao = descricao;
-        this.usuario = usuario;
+        this.nomeEmpresa = nomeEmpresa;
     }
 
 }
