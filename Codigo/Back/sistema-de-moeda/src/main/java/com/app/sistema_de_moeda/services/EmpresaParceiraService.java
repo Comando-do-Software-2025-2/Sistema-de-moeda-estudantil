@@ -14,11 +14,8 @@ import java.util.stream.Collectors;
 public class EmpresaParceiraService {
     private final EmpresaParceiraRepository empresaParceiraRepository;
 
-    public List<EmpresaParceiraDto> buscarEmpresas() {
-        return empresaParceiraRepository.findAll()
-                .stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+    public List<EmpresaParceira> buscarEmpresas() {
+        return empresaParceiraRepository.findAll();
     }
 
     public void criarEmpresa(EmpresaParceiraDto empresaDto) {
@@ -26,17 +23,17 @@ public class EmpresaParceiraService {
         empresaParceiraRepository.save(empresa);
     }
 
-    public EmpresaParceiraDto buscarEmpresa(Long id) {
+    public EmpresaParceira buscarEmpresa(Long id) {
         EmpresaParceira empresa = empresaParceiraRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Empresa não encontrada"));
-        return mapToDto(empresa);
+        return empresa;
     }
 
     public void deletarEmpresa(Long id) {
         empresaParceiraRepository.deleteById(id);
     }
 
-    public EmpresaParceiraDto editarEmpresa(Long id, EmpresaParceiraDto empresaDto) {
+    public EmpresaParceira editarEmpresa(Long id, EmpresaParceiraDto empresaDto) {
         EmpresaParceira empresa = empresaParceiraRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Empresa não encontrada"));
 
@@ -44,12 +41,8 @@ public class EmpresaParceiraService {
         empresa.setDescricao(empresa.getDescricao());
         empresa.setCnpj(empresaDto.cnpj());
 
-        empresa = empresaParceiraRepository.save(empresa);
-        return mapToDto(empresa);
-    }
-
-    private EmpresaParceiraDto mapToDto(EmpresaParceira empresa) {
-        return new EmpresaParceiraDto(empresa.getUsuario(), empresa.getCnpj(), empresa.getDescricao());
+        empresaParceiraRepository.save(empresa);
+        return empresa;
     }
 
 }

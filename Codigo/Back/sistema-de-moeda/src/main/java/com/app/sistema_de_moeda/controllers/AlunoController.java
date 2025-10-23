@@ -1,6 +1,7 @@
 package com.app.sistema_de_moeda.controllers;
 
 import com.app.sistema_de_moeda.dtos.AlunoDto;
+import com.app.sistema_de_moeda.models.Aluno;
 import com.app.sistema_de_moeda.services.AlunoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,7 @@ public class AlunoController {
     private final AlunoService alunoService;
 
     @GetMapping
-    public ResponseEntity<List<AlunoDto>> buscarAlunos() {
+    public ResponseEntity<List<Aluno>> buscarAlunos() {
         return ResponseEntity.ok(alunoService.buscarAlunos());
     }
 
@@ -27,7 +28,7 @@ public class AlunoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AlunoDto> buscarAluno(@PathVariable Long id) {
+    public ResponseEntity<Aluno> buscarAluno(@PathVariable Long id) {
         return ResponseEntity.ok(alunoService.buscarAluno(id));
     }
 
@@ -38,7 +39,7 @@ public class AlunoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AlunoDto> editarAluno(@PathVariable Long id, @RequestBody AlunoDto alunoDto) {
+    public ResponseEntity<Aluno> editarAluno(@PathVariable Long id, @RequestBody AlunoDto alunoDto) {
         return ResponseEntity.ok(alunoService.editarAluno(id, alunoDto));
     }
 
