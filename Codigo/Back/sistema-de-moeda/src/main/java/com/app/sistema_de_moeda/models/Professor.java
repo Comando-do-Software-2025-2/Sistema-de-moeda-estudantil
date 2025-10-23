@@ -42,12 +42,12 @@ public class Professor {
 
     public Professor() {}
 
-    public Professor(Usuario usuario, Instituicao instituicao, String departamento, String cpf, BigDecimal saldoMoedas) {
+    public Professor(Usuario usuario, Instituicao instituicao, String departamento, String cpf) {
         this.usuario = usuario;
         this.instituicao = instituicao;
         this.departamento = departamento;
         this.cpf = cpf;
-        this.saldoMoedas = saldoMoedas;
+        this.saldoMoedas = BigDecimal.valueOf(1000.00);
     }
 
 }

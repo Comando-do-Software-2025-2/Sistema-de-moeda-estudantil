@@ -22,7 +22,7 @@ public class ProfessorService {
 
     public void criarProfessor(ProfessorDto professorDto) {
         Professor professor = new Professor(professorDto.usuario(), professorDto.instituicao(),
-                professorDto.departamento(), professorDto.cpf(), professorDto.saldoMoedas());
+                professorDto.departamento(), professorDto.cpf());
         professorRepository.save(professor);
     }
 

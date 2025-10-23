@@ -9,7 +9,6 @@ public record ProfessorDto(
         Usuario usuario,
         Instituicao instituicao,
         String departamento,
-        String cpf,
-        BigDecimal saldoMoedas
+        String cpf
 ) {
 }
