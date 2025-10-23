@@ -6,8 +6,8 @@ import com.app.sistema_de_moeda.models.Usuario;
 import java.math.BigDecimal;
 
 public record ProfessorDto(
-        Usuario usuario,
-        Instituicao instituicao,
+        Long usuario_id,
+        Long instituicao_id,
         String departamento,
         String cpf
 ) {

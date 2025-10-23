@@ -4,7 +4,9 @@ import com.app.sistema_de_moeda.dtos.InstituicaoDto;
 import com.app.sistema_de_moeda.dtos.ProfessorDto;
 import com.app.sistema_de_moeda.models.Instituicao;
 import com.app.sistema_de_moeda.models.Professor;
+import com.app.sistema_de_moeda.models.Usuario;
 import com.app.sistema_de_moeda.repositories.ProfessorRepository;
+import com.app.sistema_de_moeda.repositories.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,13 +17,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProfessorService {
     private final ProfessorRepository professorRepository;
+    private final UsuarioService usuarioService;
+    private final InstituicaoService instituicaoService;
 
     public Professor buscarProfessorPeloId(Long id) {
         return professorRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Instituição não encontrada."));
     }
 
     public void criarProfessor(ProfessorDto professorDto) {
-        Professor professor = new Professor(professorDto.usuario(), professorDto.instituicao(),
+        Usuario usuario = usuarioService.buscarUsuario(professorDto.usuario_id());
+        Instituicao instituicao = instituicaoService.buscarPeloId(professorDto.instituicao_id());
+        
+        Professor professor = new Professor(usuario, instituicao,
                 professorDto.departamento(), professorDto.cpf());
         professorRepository.save(professor);
     }
