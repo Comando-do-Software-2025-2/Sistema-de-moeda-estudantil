@@ -27,7 +27,7 @@ public class AlunoService {
         Usuario usuario = usuarioService.buscarUsuario(alunoDto.usuario_id());
         Instituicao instituicao = instituicaoService.buscarPeloId(alunoDto.instituicao_id());
         Aluno aluno = new Aluno(usuario,
-                instituicao, alunoDto.rg(), alunoDto.endereco(), alunoDto.curso(), alunoDto.cpf(), alunoDto.saldoMoedas());
+                instituicao, alunoDto.rg(), alunoDto.endereco(), alunoDto.curso(), alunoDto.cpf());
         alunoRepository.save(aluno);
     }
 
@@ -53,7 +53,6 @@ public class AlunoService {
         alunoExistente.setEndereco(alunoDto.endereco());
         alunoExistente.setCurso(alunoDto.curso());
         alunoExistente.setCpf(alunoDto.cpf());
-        alunoExistente.setSaldoMoedas(alunoDto.saldoMoedas());
 
         alunoRepository.save(alunoExistente);
         return alunoExistente;

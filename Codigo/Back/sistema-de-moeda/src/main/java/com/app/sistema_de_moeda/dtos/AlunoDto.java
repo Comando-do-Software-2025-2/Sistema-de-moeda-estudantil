@@ -11,7 +11,6 @@ public record AlunoDto(
         String rg,
         String endereco,
         String curso,
-        String cpf,
-        BigDecimal saldoMoedas
+        String cpf
 ) {
 }

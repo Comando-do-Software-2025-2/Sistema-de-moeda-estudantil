@@ -42,13 +42,13 @@ public class Aluno {
 
     public Aluno() {}
 
-    public Aluno(Usuario usuario, Instituicao instituicao, String rg, String endereco, String curso, String cpf, BigDecimal saldoMoedas) {
+    public Aluno(Usuario usuario, Instituicao instituicao, String rg, String endereco, String curso, String cpf) {
         this.usuario = usuario;
         this.instituicao = instituicao;
         this.rg = rg;
         this.endereco = endereco;
         this.curso = curso;
         this.cpf = cpf;
-        this.saldoMoedas = saldoMoedas;
+        this.saldoMoedas = BigDecimal.valueOf(0);
     }
 }
