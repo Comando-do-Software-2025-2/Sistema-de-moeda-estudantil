@@ -5,38 +5,48 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { User, Mail, Lock, UserCircle } from "lucide-react";
 
-const usuarioSchema = z.object({
-  nome: z
-    .string()
-    .min(3, "Nome deve ter no mínimo 3 caracteres")
-    .max(100, "Nome deve ter no máximo 100 caracteres")
-    .trim(),
-  email: z
-    .string()
-    .email("Email inválido")
-    .min(5, "Email deve ter no mínimo 5 caracteres")
-    .max(100, "Email deve ter no máximo 100 caracteres")
-    .trim()
-    .toLowerCase(),
-  senha: z
-    .string()
-    .min(8, "Senha deve ter no mínimo 8 caracteres")
-    .max(50, "Senha deve ter no máximo 50 caracteres")
-    .regex(/[A-Z]/, "Senha deve conter pelo menos uma letra maiúscula")
-    .regex(/[a-z]/, "Senha deve conter pelo menos uma letra minúscula")
-    .regex(/[0-9]/, "Senha deve conter pelo menos um número"),
-  confirmarSenha: z.string(),
-  tipoUsuario: z.enum(["Aluno", "Professor", "Empresa", "Administrador"], {
-    required_error: "Selecione o tipo de usuário",
-  }),
-}).refine((data) => data.senha === data.confirmarSenha, {
-  message: "As senhas não coincidem",
-  path: ["confirmarSenha"],
-});
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+
+const usuarioSchema = z
+  .object({
+    nome: z
+      .string()
+      .min(3, "Nome deve ter no mínimo 3 caracteres")
+      .max(100, "Nome deve ter no máximo 100 caracteres")
+      .trim(),
+    email: z
+      .string()
+      .email("E-mail inválido")
+      .min(5, "E-mail deve ter no mínimo 5 caracteres")
+      .max(100, "E-mail deve ter no máximo 100 caracteres")
+      .trim()
+      .toLowerCase(),
+    senha: z
+      .string()
+      .min(8, "Senha deve ter no mínimo 8 caracteres")
+      .max(50, "Senha deve ter no máximo 50 caracteres")
+      .regex(/[A-Z]/, "Deve conter ao menos uma letra maiúscula")
+      .regex(/[a-z]/, "Deve conter ao menos uma letra minúscula")
+      .regex(/[0-9]/, "Deve conter ao menos um número"),
+    confirmarSenha: z.string(),
+    tipoUsuario: z.enum(["Aluno", "Professor", "Empresa", "Administrador"], {
+      required_error: "Selecione o tipo de usuário",
+    }),
+  })
+  .refine((data) => data.senha === data.confirmarSenha, {
+    message: "As senhas não coincidem",
+    path: ["confirmarSenha"],
+  });
 
 type UsuarioFormData = z.infer<typeof usuarioSchema>;
 
@@ -57,25 +67,36 @@ export function UsuarioForm() {
 
   const onSubmit = async (data: UsuarioFormData) => {
     setIsSubmitting(true);
-    
+
     try {
-      // Aqui você implementaria a lógica de salvamento no backend
-      console.log("Dados do formulário:", data);
-      
-      // Simulando uma requisição
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      
+      const payload = {
+        nome: data.nome,
+        email: data.email,
+        senha: data.senha,
+        tipoUsuario: data.tipoUsuario,
+      };
+
+      const response = await fetch(`${API_BASE_URL}/usuarios`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao criar usuário");
+      }
+
       toast({
         title: "Cadastro realizado com sucesso!",
-        description: `Usuário ${data.nome} cadastrado no sistema.`,
+        description: `Usuário ${data.nome} foi cadastrado no sistema.`,
       });
-      
+
       reset();
       setTipoUsuario("");
     } catch (error) {
       toast({
         title: "Erro ao cadastrar usuário",
-        description: "Tente novamente mais tarde.",
+        description: "Verifique os dados e tente novamente.",
         variant: "destructive",
       });
     } finally {
@@ -84,7 +105,11 @@ export function UsuarioForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 w-full max-w-2xl">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="space-y-6 w-full max-w-2xl"
+    >
+      {/* Nome */}
       <div className="space-y-2">
         <Label htmlFor="nome" className="text-base text-white">
           Nome Completo
@@ -99,29 +124,35 @@ export function UsuarioForm() {
           />
         </div>
         {errors.nome && (
-          <p className="text-sm text-red-300 animate-fade-in">{errors.nome.message}</p>
+          <p className="text-sm text-red-300 animate-fade-in">
+            {errors.nome.message}
+          </p>
         )}
       </div>
 
+      {/* Email */}
       <div className="space-y-2">
         <Label htmlFor="email" className="text-base text-white">
-          Email
+          E-mail
         </Label>
         <div className="relative">
           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/60" />
           <Input
             id="email"
             type="email"
-            placeholder="seu@email.com"
+            placeholder="exemplo@email.com"
             className="pl-10 h-12 bg-white/30 backdrop-blur-sm border-white/40 text-white placeholder:text-white/70"
             {...register("email")}
           />
         </div>
         {errors.email && (
-          <p className="text-sm text-red-300 animate-fade-in">{errors.email.message}</p>
+          <p className="text-sm text-red-300 animate-fade-in">
+            {errors.email.message}
+          </p>
         )}
       </div>
 
+      {/* Tipo de Usuário */}
       <div className="space-y-2">
         <Label htmlFor="tipoUsuario" className="text-base text-white">
           Tipo de Usuário
@@ -147,10 +178,13 @@ export function UsuarioForm() {
           </Select>
         </div>
         {errors.tipoUsuario && (
-          <p className="text-sm text-red-300 animate-fade-in">{errors.tipoUsuario.message}</p>
+          <p className="text-sm text-red-300 animate-fade-in">
+            {errors.tipoUsuario.message}
+          </p>
         )}
       </div>
 
+      {/* Senha */}
       <div className="space-y-2">
         <Label htmlFor="senha" className="text-base text-white">
           Senha
@@ -166,10 +200,13 @@ export function UsuarioForm() {
           />
         </div>
         {errors.senha && (
-          <p className="text-sm text-red-300 animate-fade-in">{errors.senha.message}</p>
+          <p className="text-sm text-red-300 animate-fade-in">
+            {errors.senha.message}
+          </p>
         )}
       </div>
 
+      {/* Confirmar Senha */}
       <div className="space-y-2">
         <Label htmlFor="confirmarSenha" className="text-base text-white">
           Confirmar Senha
@@ -185,14 +222,14 @@ export function UsuarioForm() {
           />
         </div>
         {errors.confirmarSenha && (
-          <p className="text-sm text-red-300 animate-fade-in">{errors.confirmarSenha.message}</p>
+          <p className="text-sm text-red-300 animate-fade-in">
+            {errors.confirmarSenha.message}
+          </p>
         )}
       </div>
 
-      <Button 
-        type="submit" 
-        variant="hero" 
-        size="lg" 
+      <Button
+        type="submit"
         className="w-full h-14 text-base font-semibold bg-white/90 hover:bg-white text-black"
         disabled={isSubmitting}
       >
