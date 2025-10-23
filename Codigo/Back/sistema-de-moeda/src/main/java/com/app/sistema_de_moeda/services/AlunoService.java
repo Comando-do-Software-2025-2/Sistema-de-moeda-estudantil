@@ -1,7 +1,6 @@
 package com.app.sistema_de_moeda.services;
 
 import com.app.sistema_de_moeda.dtos.AlunoDto;
-import com.app.sistema_de_moeda.dtos.UsuarioDto;
 import com.app.sistema_de_moeda.models.Aluno;
 import com.app.sistema_de_moeda.models.Instituicao;
 import com.app.sistema_de_moeda.models.Usuario;
@@ -31,7 +30,7 @@ public class AlunoService {
         alunoRepository.save(aluno);
     }
 
-    public Aluno buscarAluno(Long id) {
+    public Aluno buscarAlunoPeloId(Long id) {
         return alunoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Aluno não encontrado"));
     }
 
@@ -56,6 +55,10 @@ public class AlunoService {
 
         alunoRepository.save(alunoExistente);
         return alunoExistente;
+    }
+
+    public void salvarAluno(Aluno aluno) {
+        alunoRepository.save(aluno);
     }
 
 

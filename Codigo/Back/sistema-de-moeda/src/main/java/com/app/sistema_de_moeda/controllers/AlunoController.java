@@ -29,7 +29,7 @@ public class AlunoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Aluno> buscarAluno(@PathVariable Long id) {
-        return ResponseEntity.ok(alunoService.buscarAluno(id));
+        return ResponseEntity.ok(alunoService.buscarAlunoPeloId(id));
     }
 
     @DeleteMapping("/{id}")

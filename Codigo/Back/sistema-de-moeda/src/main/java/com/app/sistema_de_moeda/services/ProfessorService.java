@@ -47,4 +47,8 @@ public class ProfessorService {
         return professores;
     }
 
+    public void salvarProfessor(Professor professor) {
+        professorRepository.save(professor);
+    }
+
 }
