@@ -29,7 +29,7 @@ public class Usuario {
     private String tipoUsuario;
 
     @Column(name = "criado_em", nullable = false)
-    private LocalDateTime criadoEm = LocalDateTime.now();
+    private LocalDateTime criadoEm;
 
     public Usuario() {}
 

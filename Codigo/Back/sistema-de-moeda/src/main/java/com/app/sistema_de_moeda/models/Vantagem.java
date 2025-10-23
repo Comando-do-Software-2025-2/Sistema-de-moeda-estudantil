@@ -27,5 +27,13 @@ public class Vantagem {
     @Column
     @NotNull
     @Positive(message = "O custo deve ser positivo")
-    private BigDecimal custo_moedas;
+    private BigDecimal custoEmMoedas;
+
+    public Vantagem() {}
+
+    public Vantagem(String titulo, String descricao, BigDecimal custoEmMoedas) {
+        this.titulo = titulo;
+        this.descricao = descricao;
+        this.custoEmMoedas = custoEmMoedas;
+    }
 }

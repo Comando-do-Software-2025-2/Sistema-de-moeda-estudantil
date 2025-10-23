@@ -23,7 +23,7 @@ public class EmpresaParceira {
     @ManyToOne(optional = false)
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
-    
+
     private String descricao;
 
     public EmpresaParceira() {}
