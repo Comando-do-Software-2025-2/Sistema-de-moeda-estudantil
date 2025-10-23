@@ -15,21 +15,22 @@ public class EmpresaParceira {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String nome;
-
     @Column(nullable = false, length = 18)
     private String cnpj;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
 
     @Column(columnDefinition = "TEXT")
     private String descricao;
 
     public EmpresaParceira() {}
 
-    public EmpresaParceira(String nome, String cnpj, String descricao) {
-        this.nome = nome;
+    public EmpresaParceira(Usuario usuario, String cnpj, String descricao) {
         this.cnpj = cnpj;
         this.descricao = descricao;
+        this.usuario = usuario;
     }
 
 }

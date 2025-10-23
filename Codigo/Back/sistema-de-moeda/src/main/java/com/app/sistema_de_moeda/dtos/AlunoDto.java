@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 public record AlunoDto(
         Usuario usuario,
         Instituicao instituicao,
-        String ra,
+        String rg,
         String endereco,
         String curso,
         String cpf,

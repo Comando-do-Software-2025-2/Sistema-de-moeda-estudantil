@@ -34,7 +34,6 @@ public class Professor {
     @Column(name = "saldo_moedas", precision = 10, scale = 2)
     private BigDecimal saldoMoedas;
 
-
     public Professor() {}
 
     public Professor(Usuario usuario, Instituicao instituicao, String departamento, String cpf, BigDecimal saldoMoedas) {

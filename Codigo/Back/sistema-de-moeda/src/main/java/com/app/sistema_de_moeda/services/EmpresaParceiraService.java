@@ -22,7 +22,7 @@ public class EmpresaParceiraService {
     }
 
     public void criarEmpresa(EmpresaParceiraDto empresaDto) {
-        EmpresaParceira empresa = new EmpresaParceira(empresaDto.nome(), empresaDto.cnpj(), empresaDto.descricao());
+        EmpresaParceira empresa = new EmpresaParceira(empresaDto.usuario(), empresaDto.cnpj(), empresaDto.descricao());
         empresaParceiraRepository.save(empresa);
     }
 
@@ -40,7 +40,7 @@ public class EmpresaParceiraService {
         EmpresaParceira empresa = empresaParceiraRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Empresa não encontrada"));
 
-        empresa.setNome(empresa.getNome());
+        empresa.setUsuario(empresa.getUsuario());
         empresa.setDescricao(empresa.getDescricao());
         empresa.setCnpj(empresaDto.cnpj());
 
@@ -49,7 +49,7 @@ public class EmpresaParceiraService {
     }
 
     private EmpresaParceiraDto mapToDto(EmpresaParceira empresa) {
-        return new EmpresaParceiraDto(empresa.getNome(), empresa.getCnpj(), empresa.getDescricao());
+        return new EmpresaParceiraDto(empresa.getUsuario(), empresa.getCnpj(), empresa.getDescricao());
     }
 
 }

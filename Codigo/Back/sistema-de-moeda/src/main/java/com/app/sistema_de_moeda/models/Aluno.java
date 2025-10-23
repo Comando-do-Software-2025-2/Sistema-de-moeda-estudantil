@@ -26,7 +26,7 @@ public class Aluno {
     private Instituicao instituicao;
 
     @Column(length = 50)
-    private String ra;
+    private String rg;
 
     @Column(length = 255)
     private String endereco;
@@ -42,10 +42,10 @@ public class Aluno {
 
     public Aluno() {}
 
-    public Aluno(Usuario usuario, Instituicao instituicao, String ra, String endereco, String curso, String cpf, BigDecimal saldoMoedas) {
+    public Aluno(Usuario usuario, Instituicao instituicao, String rg, String endereco, String curso, String cpf, BigDecimal saldoMoedas) {
         this.usuario = usuario;
         this.instituicao = instituicao;
-        this.ra = ra;
+        this.rg = rg;
         this.endereco = endereco;
         this.curso = curso;
         this.cpf = cpf;
