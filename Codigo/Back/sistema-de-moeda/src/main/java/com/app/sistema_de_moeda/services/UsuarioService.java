@@ -13,17 +13,13 @@ import java.util.List;
 public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
 
-    public List<UsuarioDto> buscarUsuarios() {
-        return usuarioRepository.findAll()
-                .stream()
-                .map(this::toDto)
-                .toList(); // Java 16+, ou .collect(Collectors.toList()) se versão anterior
+    public List<Usuario> buscarUsuarios() {
+        return usuarioRepository.findAll();
     }
 
-    public UsuarioDto buscarUsuario(Long id) {
-        Usuario usuario = usuarioRepository.findById(id)
+    public Usuario buscarUsuario(Long id) {
+        return usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado com id: " + id));
-        return toDto(usuario);
     }
 
     public void criarUsuario(UsuarioDto usuarioDto) {
@@ -43,7 +39,7 @@ public class UsuarioService {
         usuarioRepository.deleteById(id);
     }
 
-    public UsuarioDto editarUsuario(Long id, UsuarioDto usuarioDto) {
+    public Usuario editarUsuario(Long id, UsuarioDto usuarioDto) {
         Usuario usuarioExistente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado com id: " + id));
 
@@ -53,15 +49,7 @@ public class UsuarioService {
 
         usuarioRepository.save(usuarioExistente);
 
-        return toDto(usuarioExistente);
+        return usuarioExistente;
     }
 
-    private UsuarioDto toDto(Usuario usuario) {
-        return new UsuarioDto(
-                usuario.getNome(),
-                usuario.getEmail(),
-                usuario.getSenha(),
-                usuario.getTipoUsuario()
-        );
-    }
 }

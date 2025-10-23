@@ -1,6 +1,7 @@
 package com.app.sistema_de_moeda.controllers;
 
 import com.app.sistema_de_moeda.dtos.UsuarioDto;
+import com.app.sistema_de_moeda.models.Usuario;
 import com.app.sistema_de_moeda.services.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,11 +14,10 @@ import java.util.List;
 @RequestMapping("/usuarios")
 @RequiredArgsConstructor
 public class UsuarioController {
-
     private final UsuarioService usuarioService;
 
     @GetMapping
-    public ResponseEntity<List<UsuarioDto>> buscarUsuarios() {
+    public ResponseEntity<List<Usuario>> buscarUsuarios() {
         return ResponseEntity.ok(usuarioService.buscarUsuarios());
     }
 
@@ -28,7 +28,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UsuarioDto> buscarUsuario(@PathVariable Long id) {
+    public ResponseEntity<Usuario> buscarUsuario(@PathVariable Long id) {
         return ResponseEntity.ok(usuarioService.buscarUsuario(id));
     }
 
@@ -39,7 +39,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UsuarioDto> editarUsuario(@PathVariable Long id, @RequestBody UsuarioDto usuarioDto) {
+    public ResponseEntity<Usuario> editarUsuario(@PathVariable Long id, @RequestBody UsuarioDto usuarioDto) {
         return ResponseEntity.ok(usuarioService.editarUsuario(id, usuarioDto));
     }
 }
