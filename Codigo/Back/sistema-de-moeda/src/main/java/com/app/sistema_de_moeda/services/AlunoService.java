@@ -1,7 +1,10 @@
 package com.app.sistema_de_moeda.services;
 
 import com.app.sistema_de_moeda.dtos.AlunoDto;
+import com.app.sistema_de_moeda.dtos.UsuarioDto;
 import com.app.sistema_de_moeda.models.Aluno;
+import com.app.sistema_de_moeda.models.Instituicao;
+import com.app.sistema_de_moeda.models.Usuario;
 import com.app.sistema_de_moeda.repositories.AlunoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -13,14 +16,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AlunoService {
     private final AlunoRepository alunoRepository;
+    private final UsuarioService usuarioService;
+    private final InstituicaoService instituicaoService;
 
     public List<Aluno> buscarAlunos() {
         return alunoRepository.findAll();
     }
 
     public void criarAluno(AlunoDto alunoDto) {
-        Aluno aluno = new Aluno(alunoDto.usuario(),
-                alunoDto.instituicao(), alunoDto.rg(), alunoDto.endereco(), alunoDto.curso(), alunoDto.cpf(), alunoDto.saldoMoedas());
+        Usuario usuario = usuarioService.buscarUsuario(alunoDto.usuario_id());
+        Instituicao instituicao = instituicaoService.buscarPeloId(alunoDto.instituicao_id());
+        Aluno aluno = new Aluno(usuario,
+                instituicao, alunoDto.rg(), alunoDto.endereco(), alunoDto.curso(), alunoDto.cpf());
         alunoRepository.save(aluno);
     }
 
@@ -37,13 +44,15 @@ public class AlunoService {
         Aluno alunoExistente = alunoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado com id: " + id));
 
-        alunoExistente.setUsuario(alunoDto.usuario());
-        alunoExistente.setInstituicao(alunoDto.instituicao());
+        Usuario usuario = usuarioService.buscarUsuario(alunoDto.usuario_id());
+        Instituicao instituicao = instituicaoService.buscarPeloId(alunoDto.instituicao_id());
+
+        alunoExistente.setUsuario(usuario);
+        alunoExistente.setInstituicao(instituicao);
         alunoExistente.setRg(alunoDto.rg());
         alunoExistente.setEndereco(alunoDto.endereco());
         alunoExistente.setCurso(alunoDto.curso());
         alunoExistente.setCpf(alunoDto.cpf());
-        alunoExistente.setSaldoMoedas(alunoDto.saldoMoedas());
 
         alunoRepository.save(alunoExistente);
         return alunoExistente;

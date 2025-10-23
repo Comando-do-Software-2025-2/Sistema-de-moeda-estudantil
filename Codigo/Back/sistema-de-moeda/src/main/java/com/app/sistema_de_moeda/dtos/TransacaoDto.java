@@ -9,8 +9,8 @@ import java.math.BigDecimal;
 
 public record TransacaoDto(
         TipoTransacao tipoTransacao,
-        Professor professor,
-        Aluno aluno,
+        Long professor_id,
+        Long aluno_id,
         Vantagem vantagem,
         BigDecimal valorEmMoedas,
         String motivo,
