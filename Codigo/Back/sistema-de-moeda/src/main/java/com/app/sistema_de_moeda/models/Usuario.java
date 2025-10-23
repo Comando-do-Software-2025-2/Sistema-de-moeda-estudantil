@@ -1,5 +1,6 @@
 package com.app.sistema_de_moeda.models;
 
+import com.app.sistema_de_moeda.enums.TipoUsuario;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,14 +27,14 @@ public class Usuario {
     private String senha;
 
     @Column(name = "tipo_usuario", nullable = false)
-    private String tipoUsuario;
+    private TipoUsuario tipoUsuario;
 
     @Column(name = "criado_em", nullable = false)
     private LocalDateTime criadoEm;
 
     public Usuario() {}
 
-    public Usuario(String nome, String email, String senha, String tipoUsuario) {
+    public Usuario(String nome, String email, String senha, TipoUsuario tipoUsuario) {
         this.nome = nome;
         this.email = email;
         this.senha = senha;
