@@ -37,17 +37,28 @@ interface Usuario {
   const [pesquisa, setPesquisa] = useState("");
   const [usuariosFiltrados, setUsuariosFiltrados] = useState<Usuario[]>([]);
 
-  // Simulando dados - substitua pela chamada real à API
+  // Buscar todos os usuários da API
   useEffect(() => {
-    const usuariosSimulados: Usuario[] = [
-      { id: 1, nome: "João Silva", email: "joao@email.com", tipoUsuario: "Aluno" },
-      { id: 2, nome: "Maria Santos", email: "maria@email.com", tipoUsuario: "Professor" },
-      { id: 3, nome: "Pedro Oliveira", email: "pedro@email.com", tipoUsuario: "Aluno" },
-      { id: 4, nome: "Ana Costa", email: "ana@email.com", tipoUsuario: "Empresa" },
-      { id: 5, nome: "Carlos Admin", email: "carlos@email.com", tipoUsuario: "Administrador" },
-    ];
-    setUsuarios(usuariosSimulados);
-    setUsuariosFiltrados(usuariosSimulados);
+    const fetchUsuarios = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/usuarios");
+        if (!response.ok) {
+          throw new Error("Falha ao buscar usuários");
+        }
+        const data: Usuario[] = await response.json();
+        setUsuarios(data);
+        setUsuariosFiltrados(data);
+      } catch (error) {
+        console.error("Erro ao buscar usuários:", error);
+        toast({
+          title: "Erro ao carregar usuários",
+          description: "Não foi possível carregar a lista de usuários. Tente novamente mais tarde.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchUsuarios();
   }, []);
 
   // Filtrar usuários baseado na pesquisa
@@ -67,20 +78,30 @@ interface Usuario {
 
   const handleExcluir = async (id: number) => {
     try {
-      // Aqui você faria a chamada à API para excluir o usuário
-      // await api.delete(`/usuarios/${id}`);
-      
-      // Simulando a exclusão
-      setUsuarios(usuarios.filter((usuario) => usuario.id !== id));
-      
+      const response = await fetch(`http://localhost:8080/usuarios/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const text = await response.text().catch(() => null);
+        throw new Error(text || "Falha ao excluir usuário");
+      }
+
+      // Atualiza estado local removendo o usuário excluído
+      setUsuarios((prev) => prev.filter((usuario) => usuario.id !== id));
+      setUsuariosFiltrados((prev) => prev.filter((usuario) => usuario.id !== id));
+
       toast({
         title: "Usuário excluído!",
         description: "O usuário foi removido permanentemente do sistema.",
       });
     } catch (error) {
+      console.error("Erro ao excluir usuário:", error);
       toast({
         title: "Erro ao excluir usuário",
-        description: "Tente novamente mais tarde.",
+        description: (error as Error)?.message?.includes("CORS")
+          ? "Erro de CORS ao conectar com o backend. Verifique se o servidor permite conexões desta origem."
+          : "Tente novamente mais tarde.",
         variant: "destructive",
       });
     }

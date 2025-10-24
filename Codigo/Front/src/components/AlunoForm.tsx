@@ -128,14 +128,16 @@ export function AlunoForm() {
     setIsSubmitting(true);
     try {
       const payload = {
-        usuario: { id: usuarioSelecionado.id },
-        instituicao: { id: Number(data.instituicaoId) },
-        ra: data.ra,
+        usuario_id: usuarioSelecionado.id,
+        instituicao_id: Number(data.instituicaoId) ,
+        rg: data.ra,
         endereco: data.endereco,
         curso: data.curso,
         cpf: data.cpf.replace(/[^\d]/g, ""),
         saldoMoedas: 0.0,
       };
+
+      console.log(payload);
 
       const response = await fetch(`${API_BASE_URL}/alunos`, {
         method: "POST",
