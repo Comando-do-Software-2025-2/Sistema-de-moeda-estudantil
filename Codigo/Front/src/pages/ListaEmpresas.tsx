@@ -39,42 +39,28 @@ const ListaEmpresas = () => {
   const [pesquisa, setPesquisa] = useState("");
   const [empresasFiltradas, setEmpresasFiltradas] = useState<Empresa[]>([]);
 
-  // Simulando dados - substitua pela chamada real à API
+  // Buscar dados da API
   useEffect(() => {
-    const empresasSimuladas: Empresa[] = [
-      {
-        id: 1,
-        nomeEmpresa: "Restaurante Universitário",
-        cnpj: "12.345.678/0001-90",
-        descricao: "Restaurante com diversos pratos e opções de alimentação saudável para estudantes."
-      },
-      {
-        id: 2,
-        nomeEmpresa: "Livraria Campus",
-        cnpj: "23.456.789/0001-80",
-        descricao: "Livraria especializada em livros acadêmicos e materiais escolares."
-      },
-      {
-        id: 3,
-        nomeEmpresa: "Academia Fit Student",
-        cnpj: "34.567.890/0001-70",
-        descricao: "Academia com planos especiais para estudantes universitários."
-      },
-      {
-        id: 4,
-        nomeEmpresa: "Café & Cia",
-        cnpj: "45.678.901/0001-60",
-        descricao: "Cafeteria com ambiente acolhedor e wi-fi gratuito."
-      },
-      {
-        id: 5,
-        nomeEmpresa: "Tech Store",
-        cnpj: "56.789.012/0001-50",
-        descricao: "Loja de tecnologia com descontos especiais para estudantes."
-      },
-    ];
-    setEmpresas(empresasSimuladas);
-    setEmpresasFiltradas(empresasSimuladas);
+    const fetchEmpresas = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/empresas-parceiras');
+        if (!response.ok) {
+          throw new Error('Falha ao buscar empresas');
+        }
+        const data = await response.json();
+        setEmpresas(data);
+        setEmpresasFiltradas(data);
+      } catch (error) {
+        console.error('Erro ao buscar empresas:', error);
+        toast({
+          title: "Erro ao carregar empresas",
+          description: "Não foi possível carregar a lista de empresas. Tente novamente mais tarde.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchEmpresas();
   }, []);
 
   // Filtrar empresas baseado na pesquisa

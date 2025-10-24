@@ -39,9 +39,16 @@ const usuarioSchema = z
       .regex(/[a-z]/, "Deve conter ao menos uma letra minúscula")
       .regex(/[0-9]/, "Deve conter ao menos um número"),
     confirmarSenha: z.string(),
-    tipoUsuario: z.enum(["Aluno", "Professor", "Empresa", "Administrador"], {
-      required_error: "Selecione o tipo de usuário",
-    }),
+    tipoUsuario: z
+      .string({ required_error: "Selecione o tipo de usuário" })
+      .transform((val) => val.toUpperCase())
+      .refine(
+        (val) =>
+          ["ALUNO", "PROFESSOR", "EMPRESA", "ADMINISTRADOR"].includes(val),
+        {
+          message: "Selecione um tipo de usuário válido",
+        }
+      ),
   })
   .refine((data) => data.senha === data.confirmarSenha, {
     message: "As senhas não coincidem",
@@ -75,6 +82,8 @@ export function UsuarioForm() {
         senha: data.senha,
         tipoUsuario: data.tipoUsuario,
       };
+
+      console.log(payload);
 
       const response = await fetch(`${API_BASE_URL}/usuarios`, {
         method: "POST",
@@ -163,7 +172,7 @@ export function UsuarioForm() {
             value={tipoUsuario}
             onValueChange={(value) => {
               setTipoUsuario(value);
-              setValue("tipoUsuario", value as any);
+              setValue("tipoUsuario", value.toUpperCase() as any);
             }}
           >
             <SelectTrigger className="pl-10 h-12 bg-white/30 backdrop-blur-sm border-white/40 text-white">

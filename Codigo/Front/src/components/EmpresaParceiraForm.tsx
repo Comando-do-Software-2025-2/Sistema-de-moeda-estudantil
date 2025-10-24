@@ -90,24 +90,37 @@ export function EmpresaParceiraForm() {
 
   const onSubmit = async (data: EmpresaFormData) => {
     setIsSubmitting(true);
-    
+
     try {
-      // Aqui você implementaria a lógica de salvamento no backend
-      console.log("Dados do formulário:", data);
-      
-      // Simulando uma requisição
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      
+      // Envia os dados para o backend (POST)
+      const response = await fetch("http://localhost:8080/empresas-parceiras", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const text = await response.text().catch(() => null);
+        throw new Error(text || "Falha ao cadastrar empresa");
+      }
+
+      const created = await response.json().catch(() => null);
+
       toast({
         title: "Cadastro realizado com sucesso!",
-        description: `Empresa ${data.nomeEmpresa} cadastrada no sistema.`,
+        description: `Empresa ${created?.nomeEmpresa ?? data.nomeEmpresa} cadastrada no sistema.`,
       });
-      
+
       reset();
     } catch (error) {
+      console.error("Erro ao cadastrar empresa:", error);
       toast({
         title: "Erro ao cadastrar empresa",
-        description: "Tente novamente mais tarde.",
+        description: (error as Error)?.message?.includes("CORS")
+          ? "Erro de CORS ao conectar com o backend. Verifique se o servidor permite conexões desta origem."
+          : "Tente novamente mais tarde.",
         variant: "destructive",
       });
     } finally {
