@@ -1,4 +1,4 @@
-// ...existing code...
+
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -58,6 +58,13 @@ const navItems: NavItem[] = [
     icon: <Building2 className="h-5 w-5" />,
     color: "bg-sky-300/90",
   },
+  {
+    title: "Transações",
+    href: "/transactions",
+    icon: <Coins className="h-5 w-5" />,
+    color: "bg-amber-300/90",
+  },
+  // ...existing code...
 ];
 
 export function Navbar() {
@@ -80,16 +87,6 @@ export function Navbar() {
   className="flex items-center gap-3 select-none no-underline min-w-0"
   aria-label="Sistema de Moeda Estudantil - Início"
 >
-  <div className="flex items-center justify-center rounded-full p-2 bg-gradient-to-br from-amber-400 to-yellow-300 shadow-lg flex-shrink-0">
-    <Coins className="h-7 w-7 text-white drop-shadow-sm" />
-  </div>
-
-  <div className="hidden md:flex flex-col leading-tight">
-    <span className="font-extrabold text-white">
-      Moeda Estudantil
-    </span>
-  </div>
-
   <div className="md:hidden font-extrabold text-white text-lg flex-shrink-0">
     SME
   </div>
