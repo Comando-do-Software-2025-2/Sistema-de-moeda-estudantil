@@ -1,5 +1,5 @@
 import { UsuarioForm } from "@/components/UsuarioForm";
-import { Navbar } from "@/components/Navbar";
+import { DynamicNavbar } from "@/components/DynamicNavbar";
 import { UserPlus, Sparkles, Coins, Gift, BarChart2 } from "lucide-react";
 
 const CadastroUsuario = () => {
@@ -29,7 +29,7 @@ const CadastroUsuario = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      <Navbar />
+      <DynamicNavbar />
       {/* Video Background */}
       <div className="fixed inset-0 z-0">
         <video

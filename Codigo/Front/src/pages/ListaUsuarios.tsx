@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Navbar } from "@/components/Navbar";
+import { DynamicNavbar } from "@/components/DynamicNavbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -119,7 +119,7 @@ interface Usuario {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      <Navbar />
+      <DynamicNavbar />
       {/* Video Background */}
       <div className="fixed inset-0 z-0">
         <video

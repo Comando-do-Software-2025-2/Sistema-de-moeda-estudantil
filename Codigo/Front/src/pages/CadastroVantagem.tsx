@@ -1,5 +1,5 @@
 import { VantagemForm } from "@/components/VantagemForm";
-import { Navbar } from "@/components/Navbar";
+import { DynamicNavbar } from "@/components/DynamicNavbar";
 import { Gift, Sparkles, Coins, Star, Trophy, Crown } from "lucide-react";
 
 const CadastroVantagem = () => {
@@ -29,7 +29,7 @@ const CadastroVantagem = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      <Navbar />
+      <DynamicNavbar />
       {/* Video Background */}
       <div className="fixed inset-0 z-0">
         <video autoPlay loop muted playsInline className="w-full h-full object-cover">

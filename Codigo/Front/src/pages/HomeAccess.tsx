@@ -1,9 +1,15 @@
 import { useNavigate } from "react-router-dom";
-import { Navbar } from "@/components/Navbar";
 import { GraduationCap, Sparkles, Shield, UserCircle, Building2, BookOpen } from "lucide-react";
+import { useAuth, UserRole } from "@/contexts/AuthContext";
 
 const HomeAccess = () => {
   const navigate = useNavigate();
+  const { setUserRole } = useAuth();
+
+  const handleAccessClick = (role: UserRole, route: string) => {
+    setUserRole(role);
+    navigate(route);
+  };
 
   const accessOptions = [
     {
@@ -11,7 +17,8 @@ const HomeAccess = () => {
       description: "Gerencie o sistema e todos os usuários",
       icon: <Shield className="h-8 w-8" />,
       gradient: "from-blue-400/25 to-blue-200/10",
-      route: "/admin",
+      route: "/lista-usuarios",
+      role: "admin" as UserRole,
       color: "blue",
     },
     {
@@ -19,7 +26,8 @@ const HomeAccess = () => {
       description: "Acesse seu perfil e saldo de moedas",
       icon: <UserCircle className="h-8 w-8" />,
       gradient: "from-green-400/25 to-green-200/10",
-      route: "/aluno",
+      route: "/",
+      role: "aluno" as UserRole,
       color: "green",
     },
     {
@@ -27,7 +35,8 @@ const HomeAccess = () => {
       description: "Gerencie vantagens e parceria",
       icon: <Building2 className="h-8 w-8" />,
       gradient: "from-amber-400/25 to-amber-200/10",
-      route: "/empresa",
+      route: "/cadastro-vantagem",
+      role: "empresa" as UserRole,
       color: "amber",
     },
     {
@@ -35,14 +44,14 @@ const HomeAccess = () => {
       description: "Envie moedas e acompanhe alunos",
       icon: <BookOpen className="h-8 w-8" />,
       gradient: "from-purple-400/25 to-purple-200/10",
-      route: "/professor",
+      route: "/cadastro-aluno",
+      role: "professor" as UserRole,
       color: "purple",
     },
   ];
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      <Navbar />
       {/* Video Background */}
       <div className="fixed inset-0 z-0">
         <video autoPlay loop muted playsInline className="w-full h-full object-cover">
@@ -76,7 +85,7 @@ const HomeAccess = () => {
           {accessOptions.map((option, index) => (
             <button
               key={index}
-              onClick={() => navigate(option.route)}
+              onClick={() => handleAccessClick(option.role, option.route)}
               className={`group relative overflow-hidden rounded-2xl p-8 border border-white/20 transform transition-all duration-350 will-change-transform
                 bg-gradient-to-br ${option.gradient} backdrop-blur-md hover:shadow-2xl hover:-translate-y-3 hover:scale-105 text-left`}
               style={{ animationDelay: `${index * 100}ms`, animationName: "fadeUp", animationDuration: "420ms", animationFillMode: "both" }}

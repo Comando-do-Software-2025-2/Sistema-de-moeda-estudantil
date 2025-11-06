@@ -1,4 +1,4 @@
-import { Navbar } from "@/components/Navbar";
+import { DynamicNavbar } from "@/components/DynamicNavbar";
 import { SendCoins } from "@/components/SendCoins";
 import { TransactionHistory } from "@/components/TransactionHistory";
 import { Coins, PiggyBank, Sparkles, TrendingUp, History } from "lucide-react";
@@ -27,7 +27,7 @@ export default function Transactions() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      <Navbar />
+      <DynamicNavbar />
       {/* Video Background */}
       <div className="fixed inset-0 z-0">
         <video autoPlay loop muted playsInline className="w-full h-full object-cover">

@@ -3,6 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import HomeAccess from "./pages/HomeAccess";
 import CadastroUsuario from "./pages/CadastroUsuario";
@@ -19,32 +21,101 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<HomeAccess />} />
-          {/* Rotas base para cada tipo de acesso */}
-          <Route path="/admin/*" element={<Index />} />
-          <Route path="/aluno/*" element={<NotFound />} />
-          <Route path="/empresa/*" element={<CadastroVantagem />} />
-          <Route path="/professor/*" element={<ListaUsuarios />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="/cadastro-usuario" element={<CadastroUsuario />} />
-          <Route path="/cadastro-aluno" element={<CadastroAluno />} />
-          <Route path="/lista-usuarios" element={<ListaUsuarios />} />
-          <Route path="/editar-usuario/:id" element={<EditarUsuario />} />
-          <Route path="/lista-empresas" element={<ListaEmpresas />} />
-          <Route path="/editar-empresa/:id" element={<EditarEmpresa />} />
-          <Route path="/transactions" element={<Transactions />} />
-          <Route path="/cadastro-vantagem" element={<CadastroVantagem />} />
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<HomeAccess />} />
+            
+            {/* Rotas do Admin */}
+            <Route
+              path="/cadastro-empresa"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <Index />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cadastro-usuario"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <CadastroUsuario />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/lista-usuarios"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <ListaUsuarios />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/editar-usuario/:id"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <EditarUsuario />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/lista-empresas"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <ListaEmpresas />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/editar-empresa/:id"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <EditarEmpresa />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* CATCH-ALL ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+            {/* Rotas do Professor */}
+            <Route
+              path="/cadastro-aluno"
+              element={
+                <ProtectedRoute allowedRoles={["professor"]}>
+                  <CadastroAluno />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/transactions"
+              element={
+                <ProtectedRoute allowedRoles={["professor"]}>
+                  <Transactions />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Rotas da Empresa */}
+            <Route
+              path="/cadastro-vantagem"
+              element={
+                <ProtectedRoute allowedRoles={["empresa"]}>
+                  <CadastroVantagem />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Rotas do Aluno - futuras rotas aqui */}
+            {/* <Route path="/perfil-aluno" element={<ProtectedRoute allowedRoles={["aluno"]}><PerfilAluno /></ProtectedRoute>} /> */}
+
+            {/* CATCH-ALL ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

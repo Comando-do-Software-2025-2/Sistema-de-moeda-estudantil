@@ -1,6 +1,6 @@
 
 import { AlunoForm } from "@/components/AlunoForm";
-import { Navbar } from "@/components/Navbar";
+import { DynamicNavbar } from "@/components/DynamicNavbar";
 import { GraduationCap, Sparkles, Coins, Gift, BarChart2, Star } from "lucide-react";
 
 const CadastroAluno = () => {
@@ -30,7 +30,7 @@ const CadastroAluno = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      <Navbar />
+      <DynamicNavbar />
       {/* Video Background */}
       <div className="fixed inset-0 z-0">
         <video autoPlay loop muted playsInline className="w-full h-full object-cover">

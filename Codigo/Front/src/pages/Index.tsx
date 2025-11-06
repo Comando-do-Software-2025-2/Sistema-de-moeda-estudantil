@@ -1,11 +1,11 @@
 import { EmpresaParceiraForm } from "@/components/EmpresaParceiraForm";
-import { Navbar } from "@/components/Navbar";
+import { DynamicNavbar } from "@/components/DynamicNavbar";
 import { Coins, Sparkles } from "lucide-react";
 
 const Index = () => {
   return (
     <div className="min-h-screen relative overflow-hidden">
-      <Navbar />
+      <DynamicNavbar />
       {/* Video Background */}
       <div className="fixed inset-0 z-0">
         <video
