@@ -29,6 +29,9 @@ public class Vantagem {
     @Positive(message = "O custo deve ser positivo")
     private BigDecimal custoEmMoedas;
 
+    @Column(length = 2048)
+    private String foto; // URL opcional da imagem da vantagem
+
     public Vantagem() {}
 
     public Vantagem(String titulo, String descricao, BigDecimal custoEmMoedas) {

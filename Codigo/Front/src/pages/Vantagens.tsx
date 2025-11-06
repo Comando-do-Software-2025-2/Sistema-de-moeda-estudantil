@@ -130,8 +130,8 @@ const Vantagens = () => {
                   className="group relative overflow-hidden rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300"
                 >
                   {/* Image/Header */}
-                  {v.foto ? (
-                    <div className="h-40 w-full overflow-hidden">
+                  <div className="h-40 w-full overflow-hidden bg-gradient-to-br from-amber-400/25 to-amber-200/10 flex items-center justify-center relative">
+                    {v.foto && v.foto.trim() !== "" ? (
                       <img
                         src={v.foto}
                         alt={v.titulo}
@@ -140,12 +140,11 @@ const Vantagens = () => {
                           (e.currentTarget as HTMLImageElement).style.display = "none";
                         }}
                       />
-                    </div>
-                  ) : (
-                    <div className="h-40 w-full bg-gradient-to-br from-amber-400/25 to-amber-200/10 flex items-center justify-center">
+                    ) : (
                       <Gift className="h-10 w-10 text-amber-300" />
-                    </div>
-                  )}
+                    )}
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-30 transition-opacity" />
+                  </div>
 
                   {/* Body */}
                   <div className="p-5">
