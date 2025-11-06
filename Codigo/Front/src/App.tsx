@@ -12,6 +12,7 @@ import EditarUsuario from "./pages/EditarUsuario";
 import ListaEmpresas from "./pages/ListaEmpresas";
 import EditarEmpresa from "./pages/EditarEmpresa";
 import Transactions from "./pages/Transactions";
+import CadastroVantagem from "./pages/CadastroVantagem";
 
 const queryClient = new QueryClient();
 
@@ -30,7 +31,8 @@ const App = () => (
           <Route path="/editar-usuario/:id" element={<EditarUsuario />} />
           <Route path="/lista-empresas" element={<ListaEmpresas />} />
           <Route path="/editar-empresa/:id" element={<EditarEmpresa />} />
-                <Route path="/transactions" element={<Transactions />} />
+          <Route path="/transactions" element={<Transactions />} />
+          <Route path="/cadastro-vantagem" element={<CadastroVantagem />} />
 
           {/* CATCH-ALL ROUTE */}
           <Route path="*" element={<NotFound />} />
