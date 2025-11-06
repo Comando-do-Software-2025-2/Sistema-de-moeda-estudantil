@@ -1,8 +1,10 @@
 import { VantagemForm } from "@/components/VantagemForm";
+import { useNavigate } from "react-router-dom";
 import { DynamicNavbar } from "@/components/DynamicNavbar";
 import { Gift, Sparkles, Coins, Star, Trophy, Crown } from "lucide-react";
 
 const CadastroVantagem = () => {
+  const navigate = useNavigate();
   const infoCards = [
     {
       title: "Recompensas Exclusivas",
@@ -69,7 +71,7 @@ const CadastroVantagem = () => {
               <p className="text-white/80">Preencha as informações da vantagem que será oferecida aos alunos</p>
             </div>
 
-            <VantagemForm />
+            <VantagemForm onSuccess={() => navigate("/vantagens")} />
 
             <div className="mt-8 pt-8 border-t border-white/20">
               <div className="flex items-center justify-center gap-2 text-white/70 text-sm">

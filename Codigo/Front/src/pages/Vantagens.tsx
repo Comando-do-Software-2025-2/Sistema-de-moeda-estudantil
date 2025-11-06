@@ -64,21 +64,21 @@ const Vantagens = () => {
           <source src="/fundo.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
-        <div className="absolute inset-0 bg-black/30" />
+  <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-amber-900/10 to-black/30" />
       </div>
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center min-h-screen px-4 py-12 pt-24 w-full">
+  <div className="relative z-10 flex flex-col items-center min-h-screen px-4 py-12 pt-24 w-full bg-gradient-to-br from-amber-50/5 to-black/60">
         {/* Header */}
-        <div className="text-center mb-8 animate-fade-in-up">
+  <div className="text-center mb-8 animate-fade-in-up">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <Gift className="h-12 w-12 text-secondary animate-scale-in" />
+            <Gift className="h-12 w-12 text-amber-300 animate-scale-in drop-shadow-xl" />
             <h1 className="text-5xl md:text-6xl font-bold text-white tracking-tight drop-shadow-lg">
               Vantagens Disponíveis
             </h1>
           </div>
           <div className="flex items-center justify-center gap-2 mb-6">
-            <Sparkles className="h-5 w-5 text-secondary-glow" />
+            <Sparkles className="h-5 w-5 text-amber-200 animate-pulse" />
             <p className="text-xl md:text-2xl text-white/95 font-light drop-shadow-md">
               Benefícios para você resgatar com suas moedas
             </p>
@@ -89,7 +89,7 @@ const Vantagens = () => {
         </div>
 
         {/* Search and Count */}
-        <div className="w-full max-w-5xl mb-6">
+  <div className="w-full max-w-5xl mb-6">
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
               <Input
@@ -100,7 +100,7 @@ const Vantagens = () => {
               />
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/70" />
             </div>
-            <Badge className="bg-white/20 text-white border-white/20">
+            <Badge className="bg-amber-400/20 text-amber-100 border-amber-400/30 shadow-md">
               {filtered.length} {filtered.length === 1 ? "vantagem" : "vantagens"}
             </Badge>
           </div>
@@ -108,15 +108,15 @@ const Vantagens = () => {
 
         {/* State handling */}
         {loading && (
-          <div className="text-white/90 animate-pulse">Carregando vantagens...</div>
+          <div className="text-amber-200/90 animate-pulse text-lg font-semibold">Carregando vantagens...</div>
         )}
         {error && !loading && (
-          <div className="text-red-200 bg-red-500/20 border border-red-400/30 rounded-lg px-4 py-3">
+          <div className="text-red-200 bg-red-500/20 border border-red-400/30 rounded-lg px-4 py-3 font-semibold shadow-lg">
             {error}
           </div>
         )}
         {!loading && !error && filtered.length === 0 && (
-          <div className="text-white/80">Nenhuma vantagem encontrada.</div>
+          <div className="text-white/80 font-semibold">Nenhuma vantagem encontrada.</div>
         )}
 
         {/* Grid */}

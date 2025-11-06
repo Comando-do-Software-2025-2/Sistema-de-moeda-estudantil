@@ -23,7 +23,7 @@ const vantagemSchema = z.object({
 
 type VantagemFormData = z.infer<typeof vantagemSchema>;
 
-export function VantagemForm() {
+export function VantagemForm({ onSuccess }: { onSuccess?: () => void }) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewImage, setPreviewImage] = useState<string>("");
@@ -74,9 +74,9 @@ export function VantagemForm() {
         title: "Vantagem cadastrada!",
         description: "A vantagem foi cadastrada com sucesso no sistema.",
       });
-
       reset();
       setPreviewImage("");
+      if (onSuccess) onSuccess();
     } catch (error) {
       toast({
         title: "Erro ao cadastrar vantagem",
