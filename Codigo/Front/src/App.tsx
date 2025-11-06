@@ -16,6 +16,7 @@ import ListaEmpresas from "./pages/ListaEmpresas";
 import EditarEmpresa from "./pages/EditarEmpresa";
 import Transactions from "./pages/Transactions";
 import CadastroVantagem from "./pages/CadastroVantagem";
+import HistoricoTransacoes from "./pages/HistoricoTransacoes";
 
 const queryClient = new QueryClient();
 
@@ -107,8 +108,15 @@ const App = () => (
               }
             />
 
-            {/* Rotas do Aluno - futuras rotas aqui */}
-            {/* <Route path="/perfil-aluno" element={<ProtectedRoute allowedRoles={["aluno"]}><PerfilAluno /></ProtectedRoute>} /> */}
+            {/* Rotas do Aluno */}
+            <Route
+              path="/historico-transacoes"
+              element={
+                <ProtectedRoute allowedRoles={["aluno"]}>
+                  <HistoricoTransacoes />
+                </ProtectedRoute>
+              }
+            />
 
             {/* CATCH-ALL ROUTE */}
             <Route path="*" element={<NotFound />} />

@@ -14,6 +14,7 @@ import {
   LogOut,
   Coins,
   Sparkles,
+  History,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -30,6 +31,12 @@ const navItems: NavItem[] = [
     href: "/",
     icon: <Home className="h-5 w-5" />,
     color: "bg-yellow-300/90",
+  },
+  {
+    title: "Histórico de Transações",
+    href: "/historico-transacoes",
+    icon: <History className="h-5 w-5" />,
+    color: "bg-blue-300/90",
   },
 ];
 
