@@ -13,98 +13,72 @@ import { Search, History, ArrowUpRight, ArrowDownLeft, Coins } from "lucide-reac
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-interface Transaction {
-  id: string;
-  type: 'sent' | 'received';
-  amount: number;
-  description: string;
-  senderName?: string;
-  receiverName?: string;
-  createdAt: Date;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+
+interface Transacao {
+  id: number;
+  tipoTransacao: string;
+  professor: {
+    id: number;
+    usuario: {
+      nome: string;
+    };
+  };
+  aluno: {
+    id: number;
+    usuario: {
+      nome: string;
+    };
+  };
+  valorEmMoedas: number;
+  motivo: string;
+  dataTransacao: string;
 }
 
 const HistoricoTransacoes = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [transacoes, setTransacoes] = useState<Transacao[]>([]);
   const [pesquisa, setPesquisa] = useState("");
-  const [transactionsFiltradas, setTransactionsFiltradas] = useState<Transaction[]>([]);
+  const [transacoesFiltradas, setTransacoesFiltradas] = useState<Transacao[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Mock data - substituir pela chamada à API
+  // Buscar transações da API
   useEffect(() => {
-    const mockTransactions: Transaction[] = [
-      {
-        id: "1",
-        type: "received",
-        amount: 50,
-        description: "Participação em projeto de pesquisa",
-        senderName: "Prof. João Silva",
-        createdAt: new Date(2024, 10, 1),
-      },
-      {
-        id: "2",
-        type: "received",
-        amount: 30,
-        description: "Atividade extra-curricular",
-        senderName: "Prof. Maria Santos",
-        createdAt: new Date(2024, 10, 3),
-      },
-      {
-        id: "3",
-        type: "sent",
-        amount: 25,
-        description: "Resgate: Desconto na Cantina",
-        receiverName: "Restaurante Universitário",
-        createdAt: new Date(2024, 10, 5),
-      },
-      {
-        id: "4",
-        type: "received",
-        amount: 40,
-        description: "Melhor nota da turma",
-        senderName: "Prof. Carlos Oliveira",
-        createdAt: new Date(2024, 10, 8),
-      },
-      {
-        id: "5",
-        type: "sent",
-        amount: 15,
-        description: "Resgate: Vale Livraria",
-        receiverName: "Livraria Acadêmica",
-        createdAt: new Date(2024, 10, 10),
-      },
-      {
-        id: "6",
-        type: "received",
-        amount: 60,
-        description: "Apresentação de trabalho no seminário",
-        senderName: "Prof. Ana Paula",
-        createdAt: new Date(2024, 10, 12),
-      },
-    ];
+    const fetchTransacoes = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/transacoes`);
+        if (!response.ok) throw new Error('Erro ao buscar transações');
+        
+        const data = await response.json();
+        setTransacoes(data);
+        setTransacoesFiltradas(data);
+      } catch (error) {
+        console.error('Erro ao buscar transações:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    setTransactions(mockTransactions);
-    setTransactionsFiltradas(mockTransactions);
+    fetchTransacoes();
   }, []);
 
   // Filtrar transações baseado na pesquisa
   useEffect(() => {
-    const filtradas = transactions.filter(
-      (transaction) =>
-        transaction.description.toLowerCase().includes(pesquisa.toLowerCase()) ||
-        transaction.senderName?.toLowerCase().includes(pesquisa.toLowerCase()) ||
-        transaction.receiverName?.toLowerCase().includes(pesquisa.toLowerCase()) ||
-        transaction.amount.toString().includes(pesquisa)
+    const filtradas = transacoes.filter(
+      (transacao) =>
+        transacao.motivo.toLowerCase().includes(pesquisa.toLowerCase()) ||
+        transacao.professor.usuario.nome.toLowerCase().includes(pesquisa.toLowerCase()) ||
+        transacao.aluno.usuario.nome.toLowerCase().includes(pesquisa.toLowerCase()) ||
+        transacao.valorEmMoedas.toString().includes(pesquisa)
     );
-    setTransactionsFiltradas(filtradas);
-  }, [pesquisa, transactions]);
+    setTransacoesFiltradas(filtradas);
+  }, [pesquisa, transacoes]);
 
-  // Calcular totais
-  const totalRecebido = transactions
-    .filter(t => t.type === 'received')
-    .reduce((sum, t) => sum + t.amount, 0);
+  // Calcular totais (considerando apenas envios/recebimentos)
+  const totalRecebido = transacoes
+    .filter(t => t.tipoTransacao === 'PROFESSOR_PARA_ALUNO' || t.tipoTransacao === 'ENVIO' || t.tipoTransacao === 'RECEBIMENTO')
+    .reduce((sum, t) => sum + t.valorEmMoedas, 0);
   
-  const totalEnviado = transactions
-    .filter(t => t.type === 'sent')
-    .reduce((sum, t) => sum + t.amount, 0);
+  const totalEnviado = 0; // Será implementado quando houver transações de troca
   
   const saldoTotal = totalRecebido - totalEnviado;
 
@@ -202,7 +176,7 @@ const HistoricoTransacoes = () => {
             {/* Contador de Resultados */}
             <div className="mb-4">
               <p className="text-white/80 text-sm">
-                {transactionsFiltradas.length} transação(ões) encontrada(s)
+                {transacoesFiltradas.length} transação(ões) encontrada(s)
                 {pesquisa && ` para "${pesquisa}"`}
               </p>
             </div>
@@ -214,13 +188,22 @@ const HistoricoTransacoes = () => {
                   <TableRow className="bg-white/5 hover:bg-white/10 border-white/20">
                     <TableHead className="text-white font-semibold">Tipo</TableHead>
                     <TableHead className="text-white font-semibold">Descrição</TableHead>
-                    <TableHead className="text-white font-semibold">Origem/Destino</TableHead>
+                    <TableHead className="text-white font-semibold">De → Para</TableHead>
                     <TableHead className="text-white font-semibold">Data</TableHead>
                     <TableHead className="text-white font-semibold text-right">Valor</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {transactionsFiltradas.length === 0 ? (
+                  {isLoading ? (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center text-white/70 py-8">
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="h-5 w-5 animate-spin border-2 border-white/30 border-t-white rounded-full" />
+                          Carregando transações...
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ) : transacoesFiltradas.length === 0 ? (
                     <TableRow>
                       <TableCell
                         colSpan={5}
@@ -230,52 +213,38 @@ const HistoricoTransacoes = () => {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    transactionsFiltradas.map((transaction) => (
+                    transacoesFiltradas.map((transacao) => (
                       <TableRow
-                        key={transaction.id}
+                        key={transacao.id}
                         className="bg-white/5 hover:bg-white/10 border-white/10 transition-colors"
                       >
                         <TableCell className="text-white">
                           <div className="flex items-center gap-2">
-                            {transaction.type === 'received' ? (
-                              <>
-                                <div className="p-2 rounded-lg bg-green-500/20">
-                                  <ArrowDownLeft className="h-4 w-4 text-green-400" />
-                                </div>
-                                <span className="font-medium text-green-400">Recebido</span>
-                              </>
-                            ) : (
-                              <>
-                                <div className="p-2 rounded-lg bg-red-500/20">
-                                  <ArrowUpRight className="h-4 w-4 text-red-400" />
-                                </div>
-                                <span className="font-medium text-red-400">Utilizado</span>
-                              </>
-                            )}
+                            <div className="p-2 rounded-lg bg-green-500/20">
+                              <ArrowDownLeft className="h-4 w-4 text-green-400" />
+                            </div>
+                            <span className="font-medium text-green-400">Recebido</span>
                           </div>
                         </TableCell>
                         <TableCell className="text-white">
-                          <p className="font-medium">{transaction.description}</p>
+                          <p className="font-medium">{transacao.motivo}</p>
                         </TableCell>
                         <TableCell className="text-white/80">
-                          {transaction.type === 'received' 
-                            ? transaction.senderName 
-                            : transaction.receiverName}
+                          <div className="flex flex-col gap-1">
+                            <span className="text-sm">De: {transacao.professor.usuario.nome}</span>
+                            <span className="text-sm">Para: {transacao.aluno.usuario.nome}</span>
+                          </div>
                         </TableCell>
                         <TableCell className="text-white/70 text-sm">
-                          {format(transaction.createdAt, "dd/MM/yyyy", { locale: ptBR })}
+                          {format(new Date(transacao.dataTransacao), "dd/MM/yyyy", { locale: ptBR })}
                           <br />
                           <span className="text-xs text-white/50">
-                            {format(transaction.createdAt, "dd 'de' MMMM", { locale: ptBR })}
+                            {format(new Date(transacao.dataTransacao), "HH:mm", { locale: ptBR })}
                           </span>
                         </TableCell>
                         <TableCell className="text-right">
-                          <span className={`text-lg font-bold ${
-                            transaction.type === 'received' 
-                              ? 'text-green-400' 
-                              : 'text-red-400'
-                          }`}>
-                            {transaction.type === 'received' ? '+' : '-'}{transaction.amount}
+                          <span className="text-lg font-bold text-green-400">
+                            +{transacao.valorEmMoedas}
                           </span>
                           <span className="text-white/60 text-sm ml-1">moedas</span>
                         </TableCell>
@@ -290,7 +259,7 @@ const HistoricoTransacoes = () => {
             <div className="mt-6 pt-6 border-t border-white/20">
               <div className="flex items-center justify-between text-white/70 text-sm">
                 <p>
-                  Mostrando {transactionsFiltradas.length} de {transactions.length} transações
+                  Mostrando {transacoesFiltradas.length} de {transacoes.length} transações
                 </p>
                 <p>
                   Última atualização: {format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}

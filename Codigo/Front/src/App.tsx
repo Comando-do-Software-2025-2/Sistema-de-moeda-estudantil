@@ -17,6 +17,7 @@ import EditarEmpresa from "./pages/EditarEmpresa";
 import Transactions from "./pages/Transactions";
 import CadastroVantagem from "./pages/CadastroVantagem";
 import HistoricoTransacoes from "./pages/HistoricoTransacoes";
+import Vantagens from "./pages/Vantagens";
 
 const queryClient = new QueryClient();
 
@@ -114,6 +115,14 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={["aluno"]}>
                   <HistoricoTransacoes />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/vantagens"
+              element={
+                <ProtectedRoute allowedRoles={["aluno"]}>
+                  <Vantagens />
                 </ProtectedRoute>
               }
             />

@@ -15,6 +15,7 @@ import {
   Coins,
   Sparkles,
   History,
+  Gift,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -31,6 +32,12 @@ const navItems: NavItem[] = [
     href: "/",
     icon: <Home className="h-5 w-5" />,
     color: "bg-yellow-300/90",
+  },
+  {
+    title: "Vantagens",
+    href: "/vantagens",
+    icon: <Gift className="h-5 w-5" />,
+    color: "bg-amber-300/90",
   },
   {
     title: "Histórico de Transações",

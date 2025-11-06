@@ -26,7 +26,7 @@ const HomeAccess = () => {
       description: "Acesse seu perfil e saldo de moedas",
       icon: <UserCircle className="h-8 w-8" />,
       gradient: "from-green-400/25 to-green-200/10",
-      route: "/historico-transacoes",
+      route: "/vantagens",
       role: "aluno" as UserRole,
       color: "green",
     },
