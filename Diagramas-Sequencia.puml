@@ -1,0 +1,79 @@
+'============================================
+' Caso de Uso 1: Cadastro de Vantagem
+'============================================
+@startuml Cadastro-Vantagem
+title Caso de Uso: Cadastro de Vantagem pela Empresa Parceira
+
+actor "Empresa Parceira" as Empresa
+participant Frontend
+participant Backend
+database Database
+
+Empresa -> Frontend: 1. Acessa formulário de cadastro
+activate Frontend
+Frontend --> Empresa: 2. Exibe formulário vazio
+
+Empresa -> Frontend: 3. Preenche dados:\n- Título\n- Descrição\n- Custo em moedas\n- Foto
+
+Empresa -> Frontend: 4. Clica "Cadastrar"
+
+Frontend -> Frontend: 5. Valida campos obrigatórios
+
+Frontend -> Backend: 6. POST /vantagens\n{titulo, descricao, custoEmMoedas, foto}
+activate Backend
+
+Backend -> Database: 7. INSERT INTO vantagem
+activate Database
+
+Database --> Backend: 8. Vantagem criada (ID gerado)
+deactivate Database
+
+Backend --> Frontend: 9. 200 OK + dados da vantagem
+deactivate Backend
+
+Frontend --> Empresa: 10. Mensagem: "Vantagem cadastrada!"
+deactivate Frontend
+
+@enduml
+
+'============================================
+' Caso de Uso 2: Listagem de Vantagens
+'============================================
+@startuml Listagem-Vantagens
+title Caso de Uso: Visualização do Catálogo de Vantagens
+
+actor Aluno
+participant Frontend
+participant Backend
+database Database
+
+Aluno -> Frontend: 1. Acessa "Catálogo de Vantagens"
+activate Frontend
+
+Frontend -> Backend: 2. GET /vantagens
+activate Backend
+
+Backend -> Database: 3. SELECT * FROM vantagem
+activate Database
+
+Database --> Backend: 4. Lista de vantagens
+deactivate Database
+
+Backend --> Frontend: 5. 200 OK + vantagens
+deactivate Backend
+
+Frontend -> Frontend: 6. Renderiza cards:\n- Foto\n- Título\n- Descrição\n- Custo\n- Botão Resgatar
+
+Frontend -> Frontend: 7. Compara saldo do aluno\ncom custo das vantagens
+
+Frontend --> Aluno: 8. Exibe catálogo de vantagens
+deactivate Frontend
+
+note right of Frontend
+  Se saldo >= custo:
+    - Botão "Resgatar" habilitado
+  Senão:
+    - Botão desabilitado
+end note
+
+@enduml
