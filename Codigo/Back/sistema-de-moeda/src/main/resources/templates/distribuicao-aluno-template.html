@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parabéns! Você recebeu moedas!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            line-height: 1.6;
+            color: #333;
+        }
+        .moedas-box {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .moedas-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #27ae60;
+            text-align: center;
+        }
+        .info-box {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+        strong {
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Parabéns!</h1>
+            <p>Você recebeu novas moedas!</p>
+        </div>
+
+        <div class="content">
+            <p>Olá <strong th:text="${nomeAluno}">Aluno</strong>,</p>
+
+            <p>Estamos felizes em informar que você recebeu uma recompensa em moedas por seu desempenho!</p>
+
+            <div class="moedas-box">
+                <p>Quantidade de moedas recebidas:</p>
+                <div class="moedas-value" th:text="${quantidade}">50</div>
+                <p style="text-align: center; margin-top: 10px;">moedas</p>
+            </div>
+
+            <div class="info-box">
+                <p><strong>Professor:</strong> <span th:text="${nomeProfessor}">Prof. Nome</span></p>
+                <p><strong>Motivo:</strong> <span th:text="${motivo}">Descrição do motivo</span></p>
+            </div>
+
+            <p>Essas moedas já estão disponíveis na sua carteira e podem ser utilizadas para resgatar incríveis vantagens com nossos parceiros.</p>
+
+            <p style="margin-top: 30px;">Continue com seu excelente desempenho!</p>
+
+            <p style="margin-top: 20px; color: #666;">Atenciosamente,<br><strong>Sistema de Moeda Estudantil</strong></p>
+        </div>
+
+        <div class="footer">
+            <p>Este é um email automático. Por favor, não responda este message.</p>
+            <p>&copy; 2025 Instituto Padre Olavo - Todos os direitos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>

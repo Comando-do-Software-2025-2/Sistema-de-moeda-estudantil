@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Vantagem Resgatada</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            line-height: 1.6;
+            color: #333;
+        }
+        .notification-box {
+            background-color: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .details-box {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .details-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #bdc3c7;
+        }
+        .details-row:last-child {
+            border-bottom: none;
+        }
+        .details-label {
+            font-weight: bold;
+            color: #667eea;
+        }
+        .codigo-box {
+            background-color: #f0f0f0;
+            border: 2px dashed #667eea;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+            margin: 15px 0;
+        }
+        .codigo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #e74c3c;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+        strong {
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📢 Nova Vantagem Resgatada</h1>
+            <p>Notificação de Resgate</p>
+        </div>
+
+        <div class="content">
+            <p>Olá <strong th:text="${nomeEmpresa}">Empresa Parceira</strong>,</p>
+
+            <p>Um aluno acaba de resgatar uma das suas vantagens! Aqui estão os detalhes:</p>
+
+            <div class="notification-box">
+                <p><strong>Vantagem Resgatada:</strong> <span th:text="${nomeVantagem}">Nome da Vantagem</span></p>
+            </div>
+
+            <div class="details-box">
+                <div class="details-row">
+                    <span class="details-label">Aluno:</span>
+                    <span th:text="${nomeAluno}">Nome do Aluno</span>
+                </div>
+                <div class="details-row">
+                    <span class="details-label">Email do Aluno:</span>
+                    <span th:text="${emailAluno}">email@example.com</span>
+                </div>
+                <div class="details-row">
+                    <span class="details-label">Código de Resgate:</span>
+                    <span th:text="${codigoResgate}">ABC123XYZ</span>
+                </div>
+            </div>
+
+            <p><strong>Instruções para Validação:</strong></p>
+            <ol>
+                <li>Valide o código de resgate abaixo no seu sistema</li>
+                <li>Confirme a identidade do aluno</li>
+                <li>Processe o resgate da vantagem</li>
+                <li>Marque o código como utilizado (pode ser usado apenas uma vez)</li>
+            </ol>
+
+            <div class="codigo-box">
+                <p style="margin: 0 0 10px 0; font-size: 12px; color: #666;">CÓDIGO:</p>
+                <p class="codigo" th:text="${codigoResgate}">ABC123XYZ</p>
+            </div>
+
+            <p style="margin-top: 20px; color: #666;">Atenciosamente,<br><strong>Sistema de Moeda Estudantil</strong></p>
+        </div>
+
+        <div class="footer">
+            <p>Este é um email automático. Por favor, não responda este message.</p>
+            <p>&copy; 2025 Instituto Padre Olavo - Todos os direitos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>
