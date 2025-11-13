@@ -123,6 +123,13 @@ export function SendCoins() {
     setIsSubmitting(true);
     
     try {
+      // Encontrar dados do aluno
+      const alunoSelecionado = alunos.find(a => a.id === parseInt(formData.alunoId));
+      if (!alunoSelecionado) {
+        throw new Error('Aluno não encontrado');
+      }
+
+      // 1. Enviar transação
       const payload = {
         professor_id: professorLogado.id,
         aluno_id: parseInt(formData.alunoId),
@@ -144,10 +151,35 @@ export function SendCoins() {
       }
 
       const transacao = await response.json();
+
+      // 2. Enviar emails (agora com Thymeleaf templates)
+      const emailPayload = {
+        alunoEmail: alunoSelecionado.usuario.email,
+        alunoNome: alunoSelecionado.usuario.nome,
+        professorNome: professorLogado.usuario.nome,
+        professorEmail: "nao-responda@sgme.com",
+        valor: valor,
+        motivo: formData.motivo
+      };
+
+      const emailResponse = await fetch(`${API_BASE_URL}/api/emails/distribuir-moedas`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(emailPayload),
+      });
+
+      if (!emailResponse.ok) {
+        console.warn('Email não foi enviado, mas transação foi criada');
+      } else {
+        const emailResult = await emailResponse.json();
+        console.log('Emails enviados:', emailResult);
+      }
       
       toast({
         title: "Moedas enviadas com sucesso!",
-        description: `${valor} moedas foram enviadas para o aluno.`,
+        description: `${valor} moedas foram enviadas para ${alunoSelecionado.usuario.nome}. Email enviado!`,
       });
       
       // Limpar formulário

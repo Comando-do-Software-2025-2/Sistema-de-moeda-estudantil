@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { DynamicNavbar } from "@/components/DynamicNavbar";
-import { Gift, Sparkles, Coins, Building2, Search } from "lucide-react";
+import { Gift, Sparkles, Coins, Building2, Search, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 type VantagemApi = {
   id: number;
@@ -17,10 +19,13 @@ type VantagemApi = {
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 const Vantagens = () => {
+  const { toast } = useToast();
   const [vantagens, setVantagens] = useState<VantagemApi[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const [resgatando, setResgatando] = useState<number | null>(null);
+  const [usuarioAtual, setUsuarioAtual] = useState<{ nome: string; email: string } | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -34,6 +39,12 @@ const Vantagens = () => {
           setVantagens(data);
         } else {
           setVantagens([]);
+        }
+
+        // Carregar usuário atual do localStorage (ou contexto)
+        const usuario = localStorage.getItem("usuario");
+        if (usuario) {
+          setUsuarioAtual(JSON.parse(usuario));
         }
       } catch (e) {
         setError(e instanceof Error ? e.message : "Erro desconhecido");
@@ -53,6 +64,61 @@ const Vantagens = () => {
         .some((s) => String(s).toLowerCase().includes(q))
     );
   }, [query, vantagens]);
+
+  const handleResgate = async (vantagem: VantagemApi) => {
+    if (!usuarioAtual) {
+      toast({
+        title: "Usuário não identificado",
+        description: "Por favor, faça login novamente.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setResgatando(vantagem.id);
+
+    try {
+      // Gerar código único para o resgate
+      const codigoResgate = `VAN${Date.now()}`;
+
+      // Enviar para backend
+      const response = await fetch(`${API_BASE_URL}/api/emails/resgatar-vantagem`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          alunoEmail: usuarioAtual.email,
+          alunoNome: usuarioAtual.nome,
+          empresaNome: vantagem.empresaNome || "Empresa Parceira",
+          empresaEmail: "contato@empresa.com",
+          vantagemTitulo: vantagem.titulo,
+          codigoCupom: codigoResgate,
+          custoMoedas: vantagem.custoEmMoedas ?? vantagem.custoMoedas ?? 0,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao resgatar vantagem");
+      }
+
+      const result = await response.json();
+
+      toast({
+        title: "Vantagem resgatada com sucesso!",
+        description: `Código: ${codigoResgate}\nEmail enviado para ${usuarioAtual.email}`,
+      });
+    } catch (error) {
+      console.error("Erro no resgate:", error);
+      toast({
+        title: "Erro ao resgatar",
+        description: error instanceof Error ? error.message : "Tente novamente",
+        variant: "destructive",
+      });
+    } finally {
+      setResgatando(null);
+    }
+  };
 
   return (
     <div className="min-h-screen relative overflow-hidden">
