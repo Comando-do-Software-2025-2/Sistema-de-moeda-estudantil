@@ -144,7 +144,7 @@ public class TransacaoService {
             // Notify Company with correct email from the linked EmpresaParceira
             emailService.notificarEmpresaSobreResgate(
                     vantagem.getEmpresaParceira().getNomeEmpresa(),
-                    vantagem.getEmpresaParceira().getUsuario().getEmail(),
+                    vantagem.getEmpresaParceira().getEmail(),
                     vantagem.getTitulo(),
                     aluno.getUsuario().getNome(),
                     aluno.getUsuario().getEmail(),
@@ -156,5 +156,22 @@ public class TransacaoService {
         }
 
         return savedTransacao;
+    }
+
+    @Transactional
+    public Transacao validarCupom(String codigo, Long empresaId) {
+        Transacao transacao = transacaoRepository.findByCodigoValidacao(codigo)
+                .orElseThrow(() -> new RuntimeException("Cupom inválido ou inexistente."));
+
+        if (transacao.isCupomUtilizado()) {
+            throw new RuntimeException("Este cupom já foi utilizado.");
+        }
+
+        if (!transacao.getVantagem().getEmpresaParceira().getId().equals(empresaId)) {
+            throw new RuntimeException("Este cupom não pertence a uma vantagem desta empresa.");
+        }
+
+        transacao.setCupomUtilizado(true);
+        return transacaoRepository.save(transacao);
     }
 }

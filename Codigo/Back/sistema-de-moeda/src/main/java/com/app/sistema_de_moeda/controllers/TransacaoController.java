@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,15 +31,24 @@ public class TransacaoController {
 
     @PostMapping("/resgate")
     public ResponseEntity<Transacao> resgatarVantagem(@RequestBody TransacaoDto dto) {
-        // Note: You might need to adjust TransacaoDto to hold just aluno_id and vantagem_id for this context
         try {
             Transacao transacao = transacaoService.resgatarVantagem(dto.aluno_id(), dto.vantagem().getId());
-
-            // Call email service here using data from 'transacao'
-
             return ResponseEntity.ok(transacao);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    @PostMapping("/validar-cupom")
+    public ResponseEntity<?> validarCupom(@RequestBody Map<String, Object> payload) {
+        try {
+            String codigo = (String) payload.get("codigo");
+            Long empresaId = Long.valueOf(payload.get("empresaId").toString());
+
+            Transacao transacao = transacaoService.validarCupom(codigo, empresaId);
+            return ResponseEntity.ok(Map.of("mensagem", "Cupom validado com sucesso!", "transacao", transacao));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("erro", e.getMessage()));
         }
     }
 
