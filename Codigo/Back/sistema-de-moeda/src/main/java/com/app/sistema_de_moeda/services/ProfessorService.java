@@ -8,9 +8,11 @@ import com.app.sistema_de_moeda.models.Usuario;
 import com.app.sistema_de_moeda.repositories.ProfessorRepository;
 import com.app.sistema_de_moeda.repositories.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -19,6 +21,16 @@ public class ProfessorService {
     private final ProfessorRepository professorRepository;
     private final UsuarioService usuarioService;
     private final InstituicaoService instituicaoService;
+
+    @Transactional
+    public void adicionarSaldoSemestral() {
+        List<Professor> professors = professorRepository.findAll();
+        for (Professor prof : professors) {
+            BigDecimal saldoAtual = prof.getSaldoMoedas();
+            prof.setSaldoMoedas(saldoAtual.add(new BigDecimal("1000.00")));
+        }
+        professorRepository.saveAll(professors);
+    }
 
     public Professor buscarProfessorPeloId(Long id) {
         return professorRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Instituição não encontrada."));

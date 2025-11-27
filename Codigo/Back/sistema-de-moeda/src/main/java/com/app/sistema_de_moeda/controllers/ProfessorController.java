@@ -19,6 +19,12 @@ import java.util.Optional;
 public class ProfessorController {
     private final ProfessorService professorService;
 
+    @PostMapping("/adicionar-saldo-semestral")
+    public ResponseEntity<String> adicionarSaldoSemestral() {
+        professorService.adicionarSaldoSemestral();
+        return ResponseEntity.ok("Saldo de 1000 moedas adicionado a todos os professores.");
+    }
+
     @PostMapping
     public ResponseEntity<HttpStatus> criarProfessor(@RequestBody ProfessorDto professorDto) {
         professorService.criarProfessor(professorDto);
