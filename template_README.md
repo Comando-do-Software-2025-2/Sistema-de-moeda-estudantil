@@ -39,6 +39,7 @@ Projeto em desenvolvimento (versão inicial). Substitua os badges abaixo pelos d
 ---
 
 ## 📚 Índice
+- [Links Úteis](#-links-úteis)
 - [Sobre o Projeto](#-sobre-o-projeto)
 - [Funcionalidades Principais](#-funcionalidades-principais)
 - [Tecnologias Utilizadas](#-tecnologias-utilizadas)
@@ -166,9 +167,12 @@ Para melhor visualização e entendimento da estrutura do sistema, os diagramas 
 | Diagrama de Arquitetura | Detalhe da Arquitetura |
 | :---: | :---: |
 | **Visão Geral (Macro)** | **Camada de Serviço (Micro)** |
-| <img src="Class diagram.pdf" alt="Diagrama de classes" width="120px" height="120px"> | <img src="Lab-3-components-diagram.drawio.pdf" alt="Diagrama de Componentes ou Serviço X" width="120px" height="120px"> |
+| <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Diagrama de Visão Geral do Sistema" width="120px" height="120px"> | <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Diagrama de Componentes ou Serviço X" width="120px" height="120px"> |
 | **Modelo de Dados (Entidades)** | **Fluxo de Autenticação** |
-| <img src="lab-3-use-case-diagram.pdf" alt="Diagrama de Entidade-Relacionamento (DER)" width="120px" height="120px"> |
+| <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Diagrama de Entidade-Relacionamento (DER)" width="120px" height="120px"> | <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Diagrama de Sequência de Login" width="120px" height="120px"> |
+| **Infraestrutura (Cloud)** | **API Gateway (Rotas)** |
+| <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Diagrama de Deploy na AWS/Vercel" width="120px" height="120px"> | <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Mapa de Endpoints da API" width="120px" height="120px"> |
+
 ---
 
 ## 🔧 Instalação e Execução
