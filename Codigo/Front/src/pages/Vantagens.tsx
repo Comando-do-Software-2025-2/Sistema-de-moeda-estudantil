@@ -307,6 +307,7 @@ const Vantagens = () => {
           </div>
         )}
       </div>
+    </div>
     </TransacaoNotificadorAluno>
   );
 };

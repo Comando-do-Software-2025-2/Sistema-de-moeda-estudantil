@@ -345,7 +345,7 @@ const HistoricoTransacoes = () => {
           </div>
         </div>
       </div>
-    </div>
+    </TransacaoNotificadorAluno>
   );
 };
 
