@@ -2,10 +2,13 @@ package com.app.sistema_de_moeda.controllers;
 
 import com.app.sistema_de_moeda.dtos.UsuarioDto;
 import com.app.sistema_de_moeda.models.Usuario;
+import com.app.sistema_de_moeda.services.TokenService;
 import com.app.sistema_de_moeda.services.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,20 +18,27 @@ import java.util.Map;
 @RequestMapping("/usuarios")
 @RequiredArgsConstructor
 public class UsuarioController {
+    private final AuthenticationManager authenticationManager;
+    private final TokenService tokenService;
     private final UsuarioService usuarioService;
 
+    public record DadosTokenJWT(String token, Long id, String nome, String tipo) {}
+    public record DadosLogin(String email, String senha) {}
+
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
-        String email = credentials.get("email");
-        String senha = credentials.get("senha");
+    public ResponseEntity<?> login(@RequestBody DadosLogin dados) {
+        var authenticationToken = new UsernamePasswordAuthenticationToken(dados.email(), dados.senha());
+        var authentication = authenticationManager.authenticate(authenticationToken);
 
-        Usuario usuario = usuarioService.login(email, senha);
+        var usuario = (Usuario) authentication.getPrincipal();
+        var tokenJWT = tokenService.gerarToken(usuario);
 
-        if (usuario != null) {
-            return ResponseEntity.ok(usuario);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
-        }
+        return ResponseEntity.ok(new DadosTokenJWT(
+                tokenJWT,
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getTipoUsuario().toString()
+        ));
     }
 
     @GetMapping
