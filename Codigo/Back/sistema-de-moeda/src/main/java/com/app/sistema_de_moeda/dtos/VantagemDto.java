@@ -10,6 +10,7 @@ public record VantagemDto(
 	String descricao,
 	@JsonProperty("custoEmMoedas") @JsonAlias({"custoMoedas"}) BigDecimal custoEmMoedas,
 	String foto,
-	String empresaNome
+	String empresaNome,
+	Long empresaParceiraId
 ) {
 }

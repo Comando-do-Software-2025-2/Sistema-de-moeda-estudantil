@@ -38,7 +38,7 @@ public class EmailService {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
 
-            helper.setFrom("nao-responda@sgme.com");
+            helper.setFrom("kaiomayer2005@gmail.com");
             helper.setTo(emailAluno);
             helper.setSubject("Parabéns! Você recebeu moedas! - S.G.M.E");
             helper.setText(htmlContent, true);
@@ -64,7 +64,7 @@ public class EmailService {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
             
-            helper.setFrom("nao-responda@sgme.com");
+            helper.setFrom("kaiomayer2005@gmail.com");
             helper.setTo(emailProfessor);
             helper.setSubject("Envio de moedas confirmado - S.G.M.E");
             helper.setText(htmlContent, true);
@@ -77,7 +77,7 @@ public class EmailService {
     }
 
     @Async
-    public void enviarEmailResgateAluno(String nomeAluno, String emailAluno, String nomeVantagem, String codigoResgate, String nomeEmpresa, Integer custoMoedas) {
+    public void enviarEmailResgateAluno(String nomeAluno, String emailAluno, String nomeVantagem, String codigoResgate, String nomeEmpresa, Integer custoMoedas, String fotoUrl) {
         try {
             Context context = new Context();
             context.setVariable("nomeAluno", nomeAluno);
@@ -85,13 +85,14 @@ public class EmailService {
             context.setVariable("codigoResgate", codigoResgate);
             context.setVariable("custoMoedas", custoMoedas);
             context.setVariable("nomeEmpresa", nomeEmpresa);
+            context.setVariable("fotoUrl", fotoUrl);
 
             String htmlContent = templateEngine.process("resgate-aluno-template", context);
 
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
 
-            helper.setFrom("nao-responda@sgme.com");
+            helper.setFrom("kaiomayer2005@gmail.com");
             helper.setTo(emailAluno);
             helper.setSubject("Você resgatou uma vantagem! - S.G.M.E");
             helper.setText(htmlContent, true);
@@ -118,7 +119,7 @@ public class EmailService {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
             
-            helper.setFrom("nao-responda@sgme.com");
+            helper.setFrom("kaiomayer2005@gmail.com");
             helper.setTo(emailEmpresa);
             helper.setSubject("Nova Vantagem Resgatada - S.G.M.E");
             helper.setText(htmlContent, true);
