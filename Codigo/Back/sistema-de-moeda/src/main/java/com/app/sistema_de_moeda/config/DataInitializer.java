@@ -19,7 +19,7 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (instituicaoRepository.count() == 0) {
-            Instituicao inst = new Instituicao("PUC Minas", "12.345.678/0001-90", "Av. Dom José Gaspar, 500");
+            Instituicao inst = new Instituicao("PUC Minas", "1234567800019", "Av. Dom José Gaspar, 500");
             instituicaoRepository.save(inst);
             System.out.println("Instituição padrão criada.");
         }
