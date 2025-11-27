@@ -7,11 +7,24 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
+
+    public Usuario login(String email, String senha) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
+
+        if (usuarioOpt.isPresent()) {
+            Usuario usuario = usuarioOpt.get();
+            if (usuario.getSenha().equals(senha)) {
+                return usuario;
+            }
+        }
+        return null;
+    }
 
     public List<Usuario> buscarUsuarios() {
         return usuarioRepository.findAll();
