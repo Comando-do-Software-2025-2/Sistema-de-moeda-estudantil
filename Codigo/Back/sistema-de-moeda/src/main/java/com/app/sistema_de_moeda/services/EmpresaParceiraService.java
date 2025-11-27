@@ -21,14 +21,13 @@ public class EmpresaParceiraService {
     }
 
     public void criarEmpresa(EmpresaParceiraDto empresaDto) {
-        EmpresaParceira empresa = new EmpresaParceira(empresaDto.nomeEmpresa(), empresaDto.cnpj(), empresaDto.descricao());
+        EmpresaParceira empresa = new EmpresaParceira(empresaDto.nomeEmpresa(), empresaDto.cnpj(), empresaDto.descricao(), empresaDto.email());
         empresaParceiraRepository.save(empresa);
     }
 
     public EmpresaParceira buscarEmpresa(Long id) {
-        EmpresaParceira empresa = empresaParceiraRepository.findById(id)
+        return empresaParceiraRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Empresa não encontrada"));
-        return empresa;
     }
 
     public void deletarEmpresa(Long id) {
