@@ -41,7 +41,9 @@ interface Usuario {
   useEffect(() => {
     const fetchUsuarios = async () => {
       try {
-        const response = await fetch("http://localhost:8080/usuarios");
+        const response = await fetch("http://localhost:8080/usuarios", {
+          credentials: 'include',
+        });
         if (!response.ok) {
           throw new Error("Falha ao buscar usuários");
         }
@@ -79,6 +81,7 @@ interface Usuario {
   const handleExcluir = async (id: number) => {
     try {
       const response = await fetch(`http://localhost:8080/usuarios/${id}`, {
+        credentials: 'include',
         method: "DELETE",
       });
 

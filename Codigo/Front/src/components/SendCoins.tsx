@@ -47,13 +47,17 @@ export function SendCoins() {
     const fetchData = async () => {
       try {
         // Buscar alunos
-        const alunosResponse = await fetch(`${API_BASE_URL}/alunos`);
+        const alunosResponse = await fetch(`${API_BASE_URL}/alunos`, {
+          credentials: 'include',
+        });
         if (!alunosResponse.ok) throw new Error('Erro ao buscar alunos');
         const alunosData = await alunosResponse.json();
         setAlunos(alunosData);
 
         // Buscar professores para simular login
-        const professoresResponse = await fetch(`${API_BASE_URL}/professores`);
+        const professoresResponse = await fetch(`${API_BASE_URL}/professores`, {
+          credentials: 'include',
+        });
         if (!professoresResponse.ok) throw new Error('Erro ao buscar professor');
         const professoresData = await professoresResponse.json();
         setProfessores(professoresData);
@@ -140,6 +144,7 @@ export function SendCoins() {
       };
 
       const response = await fetch(`${API_BASE_URL}/transacoes`, {
+        credentials: 'include',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -159,29 +164,16 @@ export function SendCoins() {
         alunoEmail: alunoSelecionado.usuario.email,
         alunoNome: alunoSelecionado.usuario.nome,
         professorNome: professorLogado.usuario.nome,
-        professorEmail: "nao-responda@sgme.com",
+        professorEmail: "kaiomayer2005@gmail.com",
         valor: valor,
         motivo: formData.motivo
       };
 
-      const emailResponse = await fetch(`${API_BASE_URL}/api/emails/distribuir-moedas`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(emailPayload),
-      });
-
-      if (!emailResponse.ok) {
-        console.warn('Email não foi enviado, mas transação foi criada');
-      } else {
-        const emailResult = await emailResponse.json();
-        console.log('Emails enviados:', emailResult);
-      }
+      await enviarNotificacaoDistribuicao(emailPayload);
       
       toast({
         title: "Moedas enviadas com sucesso!",
-        description: `${valor} moedas foram enviadas para ${alunoSelecionado.usuario.nome}. Email enviado!`,
+        description: `${valor} moedas foram enviadas para ${alunoSelecionado.usuario.nome}. E-mails de notificação foram enviados!`,
       });
       
       // Limpar formulário

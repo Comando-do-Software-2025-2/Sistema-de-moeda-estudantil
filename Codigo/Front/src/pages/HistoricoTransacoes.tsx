@@ -66,7 +66,9 @@ const HistoricoTransacoes = () => {
           aluno = JSON.parse(alunoSession);
         } else {
           // Se não houver aluno armazenado, tentar buscar o primeiro
-          const alunosRes = await fetch(`${API_BASE_URL}/alunos`);
+          const alunosRes = await fetch(`${API_BASE_URL}/alunos`, {
+            credentials: 'include',
+          });
           if (alunosRes.ok) {
             const alunos = await alunosRes.json();
             if (alunos.length > 0) {
@@ -80,7 +82,9 @@ const HistoricoTransacoes = () => {
           setAlunoAtual(aluno);
         }
 
-        const response = await fetch(`${API_BASE_URL}/transacoes`);
+        const response = await fetch(`${API_BASE_URL}/transacoes`, {
+          credentials: 'include',
+        });
         if (!response.ok) throw new Error('Erro ao buscar transações');
         
         const data = await response.json();
@@ -345,7 +349,7 @@ const HistoricoTransacoes = () => {
           </div>
         </div>
       </div>
-    </TransacaoNotificadorAluno>
+    </div>
   );
 };
 

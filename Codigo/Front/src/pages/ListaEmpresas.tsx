@@ -43,7 +43,9 @@ const ListaEmpresas = () => {
   useEffect(() => {
     const fetchEmpresas = async () => {
       try {
-        const response = await fetch('http://localhost:8080/empresas-parceiras');
+        const response = await fetch('http://localhost:8080/empresas-parceiras', {
+          credentials: 'include',
+        });
         if (!response.ok) {
           throw new Error('Falha ao buscar empresas');
         }

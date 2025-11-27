@@ -47,7 +47,9 @@ export function TransactionHistory() {
           setProfessorLogado(JSON.parse(professorData));
         }
 
-        const response = await fetch(`${API_BASE_URL}/transacoes`);
+        const response = await fetch(`${API_BASE_URL}/transacoes`, {
+          credentials: 'include',
+        });
         if (!response.ok) throw new Error('Erro ao buscar transações');
         
         const data = await response.json();
