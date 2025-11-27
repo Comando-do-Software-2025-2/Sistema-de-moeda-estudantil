@@ -35,16 +35,51 @@ interface Transacao {
   dataTransacao: string;
 }
 
+interface Aluno {
+  id: number;
+  usuario: {
+    nome: string;
+    email: string;
+  };
+  saldoMoedas: number;
+}
+
 const HistoricoTransacoes = () => {
   const [transacoes, setTransacoes] = useState<Transacao[]>([]);
   const [pesquisa, setPesquisa] = useState("");
   const [transacoesFiltradas, setTransacoesFiltradas] = useState<Transacao[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [alunoAtual, setAlunoAtual] = useState<Aluno | null>(null);
 
   // Buscar transações da API
   useEffect(() => {
     const fetchTransacoes = async () => {
       try {
+        // Carregar aluno do localStorage ou sessionStorage
+        let aluno = null;
+        const alunoStored = localStorage.getItem("aluno");
+        const alunoSession = sessionStorage.getItem("alunoLogado");
+        
+        if (alunoStored) {
+          aluno = JSON.parse(alunoStored);
+        } else if (alunoSession) {
+          aluno = JSON.parse(alunoSession);
+        } else {
+          // Se não houver aluno armazenado, tentar buscar o primeiro
+          const alunosRes = await fetch(`${API_BASE_URL}/alunos`);
+          if (alunosRes.ok) {
+            const alunos = await alunosRes.json();
+            if (alunos.length > 0) {
+              aluno = alunos[0];
+              sessionStorage.setItem("alunoLogado", JSON.stringify(aluno));
+            }
+          }
+        }
+        
+        if (aluno) {
+          setAlunoAtual(aluno);
+        }
+
         const response = await fetch(`${API_BASE_URL}/transacoes`);
         if (!response.ok) throw new Error('Erro ao buscar transações');
         
@@ -63,24 +98,42 @@ const HistoricoTransacoes = () => {
 
   // Filtrar transações baseado na pesquisa
   useEffect(() => {
-    const filtradas = transacoes.filter(
+    let filtradas = transacoes.filter(
       (transacao) =>
         transacao.motivo.toLowerCase().includes(pesquisa.toLowerCase()) ||
         transacao.professor.usuario.nome.toLowerCase().includes(pesquisa.toLowerCase()) ||
         transacao.aluno.usuario.nome.toLowerCase().includes(pesquisa.toLowerCase()) ||
         transacao.valorEmMoedas.toString().includes(pesquisa)
     );
+    
+    // Se há um aluno logado, filtrar apenas transações desse aluno
+    if (alunoAtual) {
+      filtradas = filtradas.filter(t => t.aluno.id === alunoAtual.id);
+    }
+    
     setTransacoesFiltradas(filtradas);
-  }, [pesquisa, transacoes]);
+  }, [pesquisa, transacoes, alunoAtual]);
 
-  // Calcular totais (considerando apenas envios/recebimentos)
-  const totalRecebido = transacoes
-    .filter(t => t.tipoTransacao === 'PROFESSOR_PARA_ALUNO' || t.tipoTransacao === 'ENVIO' || t.tipoTransacao === 'RECEBIMENTO')
-    .reduce((sum, t) => sum + t.valorEmMoedas, 0);
+  // Usar saldo do aluno logado se disponível
+  const saldoAtual = alunoAtual ? alunoAtual.saldoMoedas : 0;
+
+  // Calcular totais (considerando apenas envios/recebimentos do aluno logado)
+  let totalRecebido = 0;
+  let totalEnviado = 0;
   
-  const totalEnviado = 0; // Será implementado quando houver transações de troca
-  
-  const saldoTotal = totalRecebido - totalEnviado;
+  if (alunoAtual) {
+    totalRecebido = transacoesFiltradas
+      .filter(t => (t.tipoTransacao === 'PROFESSOR_PARA_ALUNO' || t.tipoTransacao === 'ENVIO' || t.tipoTransacao === 'RECEBIMENTO') && t.aluno.id === alunoAtual.id)
+      .reduce((sum, t) => sum + t.valorEmMoedas, 0);
+    
+    totalEnviado = transacoesFiltradas
+      .filter(t => t.tipoTransacao === 'TROCA' && t.aluno.id === alunoAtual.id)
+      .reduce((sum, t) => sum + t.valorEmMoedas, 0);
+  } else {
+    totalRecebido = transacoesFiltradas
+      .filter(t => t.tipoTransacao === 'PROFESSOR_PARA_ALUNO' || t.tipoTransacao === 'ENVIO' || t.tipoTransacao === 'RECEBIMENTO')
+      .reduce((sum, t) => sum + t.valorEmMoedas, 0);
+  }
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -150,7 +203,7 @@ const HistoricoTransacoes = () => {
               </div>
               <div>
                 <p className="text-white/80 text-sm">Saldo Atual</p>
-                <p className="text-3xl font-bold text-white">{saldoTotal}</p>
+                <p className="text-3xl font-bold text-white">{saldoAtual}</p>
                 <p className="text-white/60 text-xs">moedas</p>
               </div>
             </div>
@@ -213,43 +266,66 @@ const HistoricoTransacoes = () => {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    transacoesFiltradas.map((transacao) => (
-                      <TableRow
-                        key={transacao.id}
-                        className="bg-white/5 hover:bg-white/10 border-white/10 transition-colors"
-                      >
-                        <TableCell className="text-white">
-                          <div className="flex items-center gap-2">
-                            <div className="p-2 rounded-lg bg-green-500/20">
-                              <ArrowDownLeft className="h-4 w-4 text-green-400" />
+                    transacoesFiltradas.map((transacao) => {
+                      const isRecebimento = transacao.tipoTransacao === 'PROFESSOR_PARA_ALUNO' || transacao.tipoTransacao === 'ENVIO' || transacao.tipoTransacao === 'RECEBIMENTO';
+                      const isTroca = transacao.tipoTransacao === 'TROCA';
+                      
+                      return (
+                        <TableRow
+                          key={transacao.id}
+                          className="bg-white/5 hover:bg-white/10 border-white/10 transition-colors"
+                        >
+                          <TableCell className="text-white">
+                            <div className="flex items-center gap-2">
+                              {isRecebimento ? (
+                                <>
+                                  <div className="p-2 rounded-lg bg-green-500/20">
+                                    <ArrowDownLeft className="h-4 w-4 text-green-400" />
+                                  </div>
+                                  <span className="font-medium text-green-400">Recebido</span>
+                                </>
+                              ) : isTroca ? (
+                                <>
+                                  <div className="p-2 rounded-lg bg-orange-500/20">
+                                    <ArrowUpRight className="h-4 w-4 text-orange-400" />
+                                  </div>
+                                  <span className="font-medium text-orange-400">Troca</span>
+                                </>
+                              ) : (
+                                <>
+                                  <div className="p-2 rounded-lg bg-blue-500/20">
+                                    <ArrowDownLeft className="h-4 w-4 text-blue-400" />
+                                  </div>
+                                  <span className="font-medium text-blue-400">Outro</span>
+                                </>
+                              )}
                             </div>
-                            <span className="font-medium text-green-400">Recebido</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-white">
-                          <p className="font-medium">{transacao.motivo}</p>
-                        </TableCell>
-                        <TableCell className="text-white/80">
-                          <div className="flex flex-col gap-1">
-                            <span className="text-sm">De: {transacao.professor.usuario.nome}</span>
-                            <span className="text-sm">Para: {transacao.aluno.usuario.nome}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-white/70 text-sm">
-                          {format(new Date(transacao.dataTransacao), "dd/MM/yyyy", { locale: ptBR })}
-                          <br />
-                          <span className="text-xs text-white/50">
-                            {format(new Date(transacao.dataTransacao), "HH:mm", { locale: ptBR })}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <span className="text-lg font-bold text-green-400">
-                            +{transacao.valorEmMoedas}
-                          </span>
-                          <span className="text-white/60 text-sm ml-1">moedas</span>
-                        </TableCell>
-                      </TableRow>
-                    ))
+                          </TableCell>
+                          <TableCell className="text-white">
+                            <p className="font-medium">{transacao.motivo}</p>
+                          </TableCell>
+                          <TableCell className="text-white/80">
+                            <div className="flex flex-col gap-1">
+                              <span className="text-sm">De: {transacao.professor?.usuario?.nome || 'Sistema'}</span>
+                              <span className="text-sm">Para: {transacao.aluno.usuario.nome}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-white/70 text-sm">
+                            {format(new Date(transacao.dataTransacao), "dd/MM/yyyy", { locale: ptBR })}
+                            <br />
+                            <span className="text-xs text-white/50">
+                              {format(new Date(transacao.dataTransacao), "HH:mm", { locale: ptBR })}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <span className={`text-lg font-bold ${isRecebimento ? 'text-green-400' : 'text-orange-400'}`}>
+                              {isRecebimento ? '+' : '-'}{transacao.valorEmMoedas}
+                            </span>
+                            <span className="text-white/60 text-sm ml-1">moedas</span>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
                   )}
                 </TableBody>
               </Table>

@@ -137,15 +137,14 @@ public class TransacaoService {
                     aluno.getUsuario().getEmail(),
                     vantagem.getTitulo(),
                     codigo,
-                    "Empresa Parceira (Verifique Detalhes)", // You might want to link Vantagem to Empresa
+                    vantagem.getEmpresaParceira().getNomeEmpresa(),
                     custo.intValue()
             );
 
-            // Notify Company (If EmpresaParceira relation exists in Vantagem model, use it here)
-            // For now using a placeholder or default email
+            // Notify Company with correct email from the linked EmpresaParceira
             emailService.notificarEmpresaSobreResgate(
-                    "Empresa Parceira",
-                    "empresa@parceira.com", // Ideally fetch from Vantagem -> Empresa relation
+                    vantagem.getEmpresaParceira().getNomeEmpresa(),
+                    vantagem.getEmpresaParceira().getUsuario().getEmail(),
                     vantagem.getTitulo(),
                     aluno.getUsuario().getNome(),
                     aluno.getUsuario().getEmail(),

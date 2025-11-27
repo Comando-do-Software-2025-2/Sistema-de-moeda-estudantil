@@ -61,6 +61,8 @@ export function SendCoins() {
         // Define o primeiro professor como padrão
         if (professoresData.length > 0) {
           setProfessorLogado(professoresData[0]);
+          // Salvar no sessionStorage para compartilhar com outros componentes
+          sessionStorage.setItem('professorLogado', JSON.stringify(professoresData[0]));
         }
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
@@ -247,7 +249,11 @@ export function SendCoins() {
             value={professorLogado?.id.toString() || ''}
             onValueChange={(value) => {
               const prof = professores.find(p => p.id.toString() === value);
-              if (prof) setProfessorLogado(prof);
+              if (prof) {
+                setProfessorLogado(prof);
+                // Atualizar no sessionStorage
+                sessionStorage.setItem('professorLogado', JSON.stringify(prof));
+              }
             }}
           >
             <SelectTrigger className="bg-orange-500/20 border-orange-500/40 text-white text-sm h-9">

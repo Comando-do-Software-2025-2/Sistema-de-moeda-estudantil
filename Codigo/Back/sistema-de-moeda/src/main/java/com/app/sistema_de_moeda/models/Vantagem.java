@@ -32,11 +32,23 @@ public class Vantagem {
     @Column(length = 2048)
     private String foto; // URL opcional da imagem da vantagem
 
+    @NotNull(message = "A empresa parceira é obrigatória")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "empresa_parceira_id", nullable = false)
+    private EmpresaParceira empresaParceira;
+
     public Vantagem() {}
 
     public Vantagem(String titulo, String descricao, BigDecimal custoEmMoedas) {
         this.titulo = titulo;
         this.descricao = descricao;
         this.custoEmMoedas = custoEmMoedas;
+    }
+
+    public Vantagem(String titulo, String descricao, BigDecimal custoEmMoedas, EmpresaParceira empresaParceira) {
+        this.titulo = titulo;
+        this.descricao = descricao;
+        this.custoEmMoedas = custoEmMoedas;
+        this.empresaParceira = empresaParceira;
     }
 }

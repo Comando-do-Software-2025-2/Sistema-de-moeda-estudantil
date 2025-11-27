@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { DynamicNavbar } from "@/components/DynamicNavbar";
+import { TransacaoNotificadorAluno } from "@/components/TransacaoNotificadorAluno";
 import { Gift, Sparkles, Coins, Building2, Search, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +17,16 @@ type VantagemApi = {
   foto?: string | null;   // optional
 };
 
+interface Aluno {
+  id: number;
+  usuario: {
+    id: number;
+    nome: string;
+    email: string;
+  };
+  saldoMoedas: number;
+}
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 const Vantagens = () => {
@@ -25,7 +36,7 @@ const Vantagens = () => {
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [resgatando, setResgatando] = useState<number | null>(null);
-  const [usuarioAtual, setUsuarioAtual] = useState<{ nome: string; email: string } | null>(null);
+  const [alunoAtual, setAlunoAtual] = useState<Aluno | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -41,10 +52,29 @@ const Vantagens = () => {
           setVantagens([]);
         }
 
-        // Carregar usuário atual do localStorage (ou contexto)
-        const usuario = localStorage.getItem("usuario");
-        if (usuario) {
-          setUsuarioAtual(JSON.parse(usuario));
+        // Tentar carregar aluno atual - primeiro tenta localStorage, depois sessionStorage
+        let aluno = null;
+        const alunoStored = localStorage.getItem("aluno");
+        const alunoSession = sessionStorage.getItem("alunoLogado");
+        
+        if (alunoStored) {
+          aluno = JSON.parse(alunoStored);
+        } else if (alunoSession) {
+          aluno = JSON.parse(alunoSession);
+        } else {
+          // Se não houver aluno armazenado, tentar buscar o primeiro aluno da API
+          const alunosRes = await fetch(`${API_BASE_URL}/alunos`);
+          if (alunosRes.ok) {
+            const alunos = await alunosRes.json();
+            if (alunos.length > 0) {
+              aluno = alunos[0];
+              sessionStorage.setItem("alunoLogado", JSON.stringify(aluno));
+            }
+          }
+        }
+        
+        if (aluno) {
+          setAlunoAtual(aluno);
         }
       } catch (e) {
         setError(e instanceof Error ? e.message : "Erro desconhecido");
@@ -66,10 +96,20 @@ const Vantagens = () => {
   }, [query, vantagens]);
 
   const handleResgate = async (vantagem: VantagemApi) => {
-    if (!usuarioAtual) {
+    if (!alunoAtual) {
       toast({
-        title: "Usuário não identificado",
+        title: "Aluno não identificado",
         description: "Por favor, faça login novamente.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const custo = vantagem.custoEmMoedas ?? vantagem.custoMoedas ?? 0;
+    if (alunoAtual.saldoMoedas < custo) {
+      toast({
+        title: "Saldo insuficiente",
+        description: `Você precisa de ${custo} moedas, mas tem apenas ${alunoAtual.saldoMoedas}.`,
         variant: "destructive",
       });
       return;
@@ -81,20 +121,15 @@ const Vantagens = () => {
       // Gerar código único para o resgate
       const codigoResgate = `VAN${Date.now()}`;
 
-      // Enviar para backend
-      const response = await fetch(`${API_BASE_URL}/api/emails/resgatar-vantagem`, {
+      // Enviar para backend - resgate de vantagem
+      const response = await fetch(`${API_BASE_URL}/transacoes/resgate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          alunoEmail: usuarioAtual.email,
-          alunoNome: usuarioAtual.nome,
-          empresaNome: vantagem.empresaNome || "Empresa Parceira",
-          empresaEmail: "contato@empresa.com",
-          vantagemTitulo: vantagem.titulo,
-          codigoCupom: codigoResgate,
-          custoMoedas: vantagem.custoEmMoedas ?? vantagem.custoMoedas ?? 0,
+          aluno_id: alunoAtual.id,
+          vantagem_id: vantagem.id,
         }),
       });
 
@@ -104,9 +139,15 @@ const Vantagens = () => {
 
       const result = await response.json();
 
+      // Atualizar saldo local
+      setAlunoAtual({
+        ...alunoAtual,
+        saldoMoedas: alunoAtual.saldoMoedas - custo,
+      });
+
       toast({
         title: "Vantagem resgatada com sucesso!",
-        description: `Código: ${codigoResgate}\nEmail enviado para ${usuarioAtual.email}`,
+        description: `Código: ${codigoResgate}\nEmail enviado para ${alunoAtual.usuario.email}`,
       });
     } catch (error) {
       console.error("Erro no resgate:", error);
@@ -121,7 +162,8 @@ const Vantagens = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <TransacaoNotificadorAluno>
+      <div className="min-h-screen relative overflow-hidden">
       <DynamicNavbar />
 
       {/* Video Background */}
@@ -153,6 +195,25 @@ const Vantagens = () => {
             Explore as vantagens cadastradas pelas empresas parceiras e planeje seus resgates
           </p>
         </div>
+
+        {/* Card de Saldo */}
+        {alunoAtual && (
+          <div className="w-full max-w-5xl mb-6 bg-gradient-to-r from-amber-400/20 to-orange-500/20 backdrop-blur-md rounded-2xl p-4 border border-amber-400/30 animate-scale-in">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-amber-200/80 text-sm">Seu Saldo Disponível</p>
+                <p className="text-white font-semibold text-lg">{alunoAtual.usuario.nome}</p>
+              </div>
+              <div className="text-right">
+                <div className="flex items-center gap-2 justify-end">
+                  <Coins className="h-6 w-6 text-amber-300" />
+                  <p className="text-amber-300 font-bold text-3xl">{alunoAtual.saldoMoedas}</p>
+                  <span className="text-amber-200/80 text-sm">moedas</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Search and Count */}
   <div className="w-full max-w-5xl mb-6">
@@ -246,7 +307,7 @@ const Vantagens = () => {
           </div>
         )}
       </div>
-    </div>
+    </TransacaoNotificadorAluno>
   );
 };
 

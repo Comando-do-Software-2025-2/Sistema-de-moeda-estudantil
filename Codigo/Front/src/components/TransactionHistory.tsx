@@ -25,14 +25,28 @@ interface Transacao {
   dataTransacao: string;
 }
 
+interface Professor {
+  id: number;
+  usuario: {
+    nome: string;
+  };
+}
+
 export function TransactionHistory() {
   const [transacoes, setTransacoes] = useState<Transacao[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [professorLogado, setProfessorLogado] = useState<Professor | null>(null);
 
   useEffect(() => {
     const fetchTransacoes = async () => {
       try {
+        // Pegar professor do sessionStorage (definido no SendCoins)
+        const professorData = sessionStorage.getItem('professorLogado');
+        if (professorData) {
+          setProfessorLogado(JSON.parse(professorData));
+        }
+
         const response = await fetch(`${API_BASE_URL}/transacoes`);
         if (!response.ok) throw new Error('Erro ao buscar transações');
         
@@ -52,7 +66,7 @@ export function TransactionHistory() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-white mb-4">Histórico de Transações</h2>
+        <h2 className="text-xl font-semibold text-white mb-4">Histórico de Transações Enviadas</h2>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-white/60" />
         </div>
@@ -63,7 +77,7 @@ export function TransactionHistory() {
   if (error) {
     return (
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-white mb-4">Histórico de Transações</h2>
+        <h2 className="text-xl font-semibold text-white mb-4">Histórico de Transações Enviadas</h2>
         <div className="bg-red-500/20 backdrop-blur-sm rounded-lg p-4 border border-red-500/30">
           <p className="text-red-300 text-center">{error}</p>
         </div>
@@ -71,17 +85,22 @@ export function TransactionHistory() {
     );
   }
 
+  // Filtrar apenas transações do professor logado
+  const minhasTransacoes = professorLogado 
+    ? transacoes.filter(t => t.professor.id === professorLogado.id)
+    : transacoes;
+
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold text-white mb-4">Histórico de Transações</h2>
+      <h2 className="text-xl font-semibold text-white mb-4">Histórico de Transações Enviadas</h2>
       
-      {transacoes.length === 0 ? (
+      {minhasTransacoes.length === 0 ? (
         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20 text-center">
           <p className="text-white/70">Nenhuma transação encontrada</p>
         </div>
       ) : (
         <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
-          {transacoes.map((transacao) => (
+          {minhasTransacoes.map((transacao) => (
             <div
               key={transacao.id}
               className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20 hover:bg-white/15 transition-colors"
@@ -93,9 +112,6 @@ export function TransactionHistory() {
                   </div>
                   <div>
                     <p className="text-white font-medium">
-                      De: {transacao.professor.usuario.nome}
-                    </p>
-                    <p className="text-white/80 text-sm">
                       Para: {transacao.aluno.usuario.nome}
                     </p>
                     <p className="text-sm text-white/60 mt-1">{transacao.motivo}</p>
