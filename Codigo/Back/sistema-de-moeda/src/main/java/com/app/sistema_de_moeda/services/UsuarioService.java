@@ -4,6 +4,7 @@ import com.app.sistema_de_moeda.dtos.UsuarioDto;
 import com.app.sistema_de_moeda.models.Usuario;
 import com.app.sistema_de_moeda.repositories.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,13 +14,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public Usuario login(String email, String senha) {
         Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
 
         if (usuarioOpt.isPresent()) {
             Usuario usuario = usuarioOpt.get();
-            if (usuario.getSenha().equals(senha)) {
+            if (passwordEncoder.matches(senha, usuario.getSenha())) {
                 return usuario;
             }
         }
@@ -39,7 +41,7 @@ public class UsuarioService {
         Usuario usuario = new Usuario(
                 usuarioDto.nome(),
                 usuarioDto.email(),
-                usuarioDto.senha(),
+                passwordEncoder.encode(usuarioDto.senha()),
                 usuarioDto.tipoUsuario()
         );
         usuarioRepository.save(usuario);
@@ -58,7 +60,10 @@ public class UsuarioService {
 
         usuarioExistente.setNome(usuarioDto.nome());
         usuarioExistente.setEmail(usuarioDto.email());
-        usuarioExistente.setSenha(usuarioDto.senha());
+
+        if (usuarioDto.senha() != null && !usuarioDto.senha().isEmpty()) {
+            usuarioExistente.setSenha(passwordEncoder.encode(usuarioDto.senha()));
+        }
 
         usuarioRepository.save(usuarioExistente);
 

@@ -2,6 +2,7 @@ package com.app.sistema_de_moeda.models;
 
 import com.app.sistema_de_moeda.models.Usuario;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -17,7 +18,6 @@ public class EmpresaParceira {
     private Long id;
 
     @NotBlank
-    @Size(max = 14)
     private String cnpj;
 
     @NotBlank
@@ -25,12 +25,16 @@ public class EmpresaParceira {
 
     private String descricao;
 
+    @Email
+    private String email;
+
     public EmpresaParceira() {}
 
-    public EmpresaParceira(String nomeEmpresa, String cnpj, String descricao) {
+    public EmpresaParceira(String nomeEmpresa, String cnpj, String descricao, String email) {
         this.cnpj = cnpj;
         this.descricao = descricao;
         this.nomeEmpresa = nomeEmpresa;
+        this.email = email;
     }
 
 }

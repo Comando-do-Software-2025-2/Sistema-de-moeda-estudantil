@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
     
@@ -24,4 +25,6 @@ public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
     
     @Query("SELECT t FROM Transacao t WHERE t.professor.id = :professorId AND t.tipoTransacao = com.app.sistema_de_moeda.enums.TipoTransacao.PROFESSOR_PARA_ALUNO ORDER BY t.dataTransacao DESC")
     List<Transacao> findTransacoesEnviadasByProfessor(@Param("professorId") Long professorId);
+
+    Optional<Transacao> findByCodigoValidacao(String codigo);
 }

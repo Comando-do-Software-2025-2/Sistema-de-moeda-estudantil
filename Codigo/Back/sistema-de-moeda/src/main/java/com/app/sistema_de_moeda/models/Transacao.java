@@ -52,6 +52,8 @@ public class Transacao {
     @PastOrPresent
     private LocalDateTime dataTransacao;
 
+    @Column(nullable = false)
+    private boolean cupomUtilizado = false;
 
     public Transacao() {}
 
