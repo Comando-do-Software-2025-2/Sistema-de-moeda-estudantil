@@ -6,7 +6,9 @@ import com.app.sistema_de_moeda.enums.TipoTransacao;
 import com.app.sistema_de_moeda.models.Aluno;
 import com.app.sistema_de_moeda.models.Professor;
 import com.app.sistema_de_moeda.models.Transacao;
+import com.app.sistema_de_moeda.models.Vantagem;
 import com.app.sistema_de_moeda.repositories.TransacaoRepository;
+import com.app.sistema_de_moeda.repositories.VantagemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,8 @@ public class TransacaoService {
     private final TransacaoRepository transacaoRepository;
     private final ProfessorService professorService;
     private final AlunoService alunoService;
+    private final EmailService emailService;
+    private final VantagemRepository vantagemRepository;
 
     @Transactional
     public Transacao enviarMoedasProfessorParaAluno(MoedasDto moedasDto) {
@@ -92,5 +96,66 @@ public class TransacaoService {
     public Transacao buscarTransacaoPorId(Long id) {
         return transacaoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Transação não encontrada com ID: " + id));
+    }
+
+    @Transactional
+    public Transacao resgatarVantagem(Long alunoId, Long vantagemId) {
+        Aluno aluno = alunoService.buscarAlunoPeloId(alunoId);
+        Vantagem vantagem = vantagemRepository.findById(vantagemId)
+                .orElseThrow(() -> new RuntimeException("Vantagem não encontrada"));
+
+        BigDecimal custo = vantagem.getCustoEmMoedas();
+
+        // 1. Check Balance
+        if (aluno.getSaldoMoedas().compareTo(custo) < 0) {
+            throw new RuntimeException("Saldo insuficiente para resgatar esta vantagem.");
+        }
+
+        // 2. Deduct Balance
+        aluno.setSaldoMoedas(aluno.getSaldoMoedas().subtract(custo));
+        alunoService.salvarAluno(aluno);
+
+        // 3. Create Transaction
+        Transacao transacao = new Transacao();
+        transacao.setTipoTransacao(TipoTransacao.TROCA);
+        transacao.setAluno(aluno);
+        // Professor is null in exchange
+        transacao.setVantagem(vantagem);
+        transacao.setValorEmMoedas(custo);
+        transacao.setMotivo("Resgate de vantagem: " + vantagem.getTitulo());
+        String codigo = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        transacao.setCodigoValidacao(codigo);
+        transacao.setDataTransacao(LocalDateTime.now());
+
+        Transacao savedTransacao = transacaoRepository.save(transacao);
+
+        // 4. Trigger Emails (Simulating Async Event)
+        try {
+            // Notify Student
+            emailService.enviarEmailResgateAluno(
+                    aluno.getUsuario().getNome(),
+                    aluno.getUsuario().getEmail(),
+                    vantagem.getTitulo(),
+                    codigo,
+                    "Empresa Parceira (Verifique Detalhes)", // You might want to link Vantagem to Empresa
+                    custo.intValue()
+            );
+
+            // Notify Company (If EmpresaParceira relation exists in Vantagem model, use it here)
+            // For now using a placeholder or default email
+            emailService.notificarEmpresaSobreResgate(
+                    "Empresa Parceira",
+                    "empresa@parceira.com", // Ideally fetch from Vantagem -> Empresa relation
+                    vantagem.getTitulo(),
+                    aluno.getUsuario().getNome(),
+                    aluno.getUsuario().getEmail(),
+                    codigo
+            );
+        } catch (Exception e) {
+            System.err.println("Erro ao enviar emails de resgate: " + e.getMessage());
+            // Don't fail transaction if email fails
+        }
+
+        return savedTransacao;
     }
 }

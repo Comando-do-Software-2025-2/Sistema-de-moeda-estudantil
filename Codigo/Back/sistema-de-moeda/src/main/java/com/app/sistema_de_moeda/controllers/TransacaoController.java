@@ -1,6 +1,7 @@
 package com.app.sistema_de_moeda.controllers;
 
 import com.app.sistema_de_moeda.dtos.MoedasDto;
+import com.app.sistema_de_moeda.dtos.TransacaoDto;
 import com.app.sistema_de_moeda.models.Transacao;
 import com.app.sistema_de_moeda.services.TransacaoService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,20 @@ public class TransacaoController {
     public ResponseEntity<Transacao> enviarMoedasProfessorParaAluno(@RequestBody MoedasDto moedasDto) {
         try {
             Transacao transacao = transacaoService.enviarMoedasProfessorParaAluno(moedasDto);
+            return ResponseEntity.ok(transacao);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    @PostMapping("/resgate")
+    public ResponseEntity<Transacao> resgatarVantagem(@RequestBody TransacaoDto dto) {
+        // Note: You might need to adjust TransacaoDto to hold just aluno_id and vantagem_id for this context
+        try {
+            Transacao transacao = transacaoService.resgatarVantagem(dto.aluno_id(), dto.vantagem().getId());
+
+            // Call email service here using data from 'transacao'
+
             return ResponseEntity.ok(transacao);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
