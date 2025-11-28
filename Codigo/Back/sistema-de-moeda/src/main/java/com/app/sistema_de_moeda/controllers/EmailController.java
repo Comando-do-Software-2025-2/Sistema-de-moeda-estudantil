@@ -69,7 +69,8 @@ public class EmailController {
                 dto.getVantagemTitulo(),
                 dto.getCodigoCupom(),
                 dto.getEmpresaNome(),
-                dto.getCustoMoedas()
+                dto.getCustoMoedas(),
+                null
             );
 
             // Notifica empresa

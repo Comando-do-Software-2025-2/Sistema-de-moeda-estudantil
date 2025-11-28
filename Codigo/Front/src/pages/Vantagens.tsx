@@ -135,11 +135,31 @@ const Vantagens = () => {
       };
       setAlunoAtual(alunoAtualizado);
       
-      // Salvar saldo e aluno atualizado em localStorage
+      // Salvar saldo e aluno atualizado em localStorage e sessionStorage
       localStorage.setItem("aluno", JSON.stringify(alunoAtualizado));
+      sessionStorage.setItem("alunoLogado", JSON.stringify(alunoAtualizado));
       
       // Remover vantagem da lista (marcar como resgatada)
       setVantagens(vantagens.filter(v => v.id !== vantagem.id));
+
+      // Disparar evento customizado para atualizar histórico de transações
+      window.dispatchEvent(new CustomEvent('transacaoRealizada', {
+        detail: {
+          id: result?.id || Date.now(),
+          tipoTransacao: 'TROCA',
+          aluno: {
+            id: alunoAtual.id,
+            usuario: {
+              nome: alunoAtual.usuario.nome,
+            },
+          },
+          professor: null,
+          valorEmMoedas: custo,
+          motivo: `Resgate de vantagem: ${vantagem.titulo}`,
+          dataTransacao: new Date().toISOString(),
+          codigoCupom: result?.codigoCupom || 'CODIGO',
+        }
+      }));
 
       toast({
         title: "Vantagem resgatada com sucesso!",

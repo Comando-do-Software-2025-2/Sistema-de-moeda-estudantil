@@ -18,12 +18,12 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080
 interface Transacao {
   id: number;
   tipoTransacao: string;
-  professor: {
+  professor?: {
     id: number;
     usuario: {
       nome: string;
     };
-  };
+  } | null;
   aluno: {
     id: number;
     usuario: {
@@ -98,6 +98,21 @@ const HistoricoTransacoes = () => {
     };
 
     fetchTransacoes();
+
+    // Ouvir evento de transação realizada
+    const handleTransacaoRealizada = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const novaTransacao = customEvent.detail;
+      
+      setTransacoes(prev => [novaTransacao, ...prev]);
+      setTransacoesFiltradas(prev => [novaTransacao, ...prev]);
+    };
+
+    window.addEventListener('transacaoRealizada', handleTransacaoRealizada);
+
+    return () => {
+      window.removeEventListener('transacaoRealizada', handleTransacaoRealizada);
+    };
   }, []);
 
   // Filtrar transações baseado na pesquisa
@@ -105,14 +120,14 @@ const HistoricoTransacoes = () => {
     let filtradas = transacoes.filter(
       (transacao) =>
         transacao.motivo.toLowerCase().includes(pesquisa.toLowerCase()) ||
-        transacao.professor.usuario.nome.toLowerCase().includes(pesquisa.toLowerCase()) ||
-        transacao.aluno.usuario.nome.toLowerCase().includes(pesquisa.toLowerCase()) ||
+        (transacao.professor?.usuario?.nome?.toLowerCase() || '').includes(pesquisa.toLowerCase()) ||
+        transacao.aluno?.usuario?.nome?.toLowerCase().includes(pesquisa.toLowerCase()) ||
         transacao.valorEmMoedas.toString().includes(pesquisa)
     );
     
     // Se há um aluno logado, filtrar apenas transações desse aluno
     if (alunoAtual) {
-      filtradas = filtradas.filter(t => t.aluno.id === alunoAtual.id);
+      filtradas = filtradas.filter(t => t.aluno?.id === alunoAtual.id);
     }
     
     setTransacoesFiltradas(filtradas);
@@ -127,11 +142,11 @@ const HistoricoTransacoes = () => {
   
   if (alunoAtual) {
     totalRecebido = transacoesFiltradas
-      .filter(t => (t.tipoTransacao === 'PROFESSOR_PARA_ALUNO' || t.tipoTransacao === 'ENVIO' || t.tipoTransacao === 'RECEBIMENTO') && t.aluno.id === alunoAtual.id)
+      .filter(t => (t.tipoTransacao === 'PROFESSOR_PARA_ALUNO' || t.tipoTransacao === 'ENVIO' || t.tipoTransacao === 'RECEBIMENTO') && t.aluno?.id === alunoAtual.id)
       .reduce((sum, t) => sum + t.valorEmMoedas, 0);
     
     totalEnviado = transacoesFiltradas
-      .filter(t => t.tipoTransacao === 'TROCA' && t.aluno.id === alunoAtual.id)
+      .filter(t => t.tipoTransacao === 'TROCA' && t.aluno?.id === alunoAtual.id)
       .reduce((sum, t) => sum + t.valorEmMoedas, 0);
   } else {
     totalRecebido = transacoesFiltradas

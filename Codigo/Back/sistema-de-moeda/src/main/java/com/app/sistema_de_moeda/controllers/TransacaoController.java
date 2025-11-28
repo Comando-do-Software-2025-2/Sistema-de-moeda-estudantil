@@ -20,12 +20,14 @@ public class TransacaoController {
 
     // Enviar moedas de professor para aluno
     @PostMapping
-    public ResponseEntity<Transacao> enviarMoedasProfessorParaAluno(@RequestBody MoedasDto moedasDto) {
+    public ResponseEntity<?> enviarMoedasProfessorParaAluno(@RequestBody MoedasDto moedasDto) {
         try {
             Transacao transacao = transacaoService.enviarMoedasProfessorParaAluno(moedasDto);
             return ResponseEntity.ok(transacao);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("erro", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("erro", e.getMessage()));
         }
     }
 

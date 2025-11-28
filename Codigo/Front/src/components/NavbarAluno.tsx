@@ -60,9 +60,6 @@ export function NavbarAluno() {
     navigate("/");
   };
 
-  // Saldo simulado - futuramente virá da API
-  const balance = 150;
-
   return (
     <nav className="fixed top-4 left-4 right-4 z-50">
       <div className="backdrop-blur-lg bg-gradient-to-r from-amber-50/20 via-emerald-50/10 to-sky-50/10 border border-white/10 rounded-2xl shadow-xl">
@@ -103,19 +100,6 @@ export function NavbarAluno() {
                   </Button>
                 </Link>
               ))}
-
-              {/* Saldo de moedas */}
-              <div className="flex items-center gap-3 bg-white/10 px-4 py-2 rounded-full ml-4">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-full bg-amber-400/90">
-                    <Coins className="h-5 w-5 text-white" />
-                  </div>
-                  <div className="text-white font-bold">
-                    {balance} <span className="text-xs font-medium text-white/80">Moedas</span>
-                  </div>
-                </div>
-                <Sparkles className="h-4 w-4 text-amber-200" />
-              </div>
               
               <Button
                 onClick={handleLogout}
@@ -173,18 +157,6 @@ export function NavbarAluno() {
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-white/10">
-                  <div className="flex items-center justify-between text-white mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-full bg-amber-400">
-                        <Coins className="h-5 w-5 text-white" />
-                      </div>
-                      <div>
-                        <div className="font-bold">{balance} Moedas</div>
-                        <div className="text-xs text-white/80">Seu saldo atual</div>
-                      </div>
-                    </div>
-                  </div>
-                  
                   <Button
                     onClick={() => {
                       setOpen(false);
