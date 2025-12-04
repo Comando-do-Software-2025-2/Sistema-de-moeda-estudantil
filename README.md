@@ -2,7 +2,6 @@
 
 # 🪙 Sistema de Moeda Estudantil
 
-> [!NOTE]
 > Sistema de gamificação e mérito estudantil desenvolvido para distribuir moedas virtuais de professores para alunos, permitindo a troca por vantagens reais em empresas parceiras.
 
 <table>
