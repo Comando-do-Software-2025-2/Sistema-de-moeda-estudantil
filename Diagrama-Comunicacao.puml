@@ -1,0 +1,129 @@
+@startuml
+' ============ ATORES ============
+actor "Usuario" as user
+
+' ============ FRONTEND ============
+package "Frontend (React)" {
+  [Interface Web] as frontend
+}
+
+' ============ BACKEND ============
+package "Backend (Spring Boot)" {
+  [Controllers] as controllers
+  [Services] as services
+  [Security] as security
+}
+
+' ============ PERSISTÊNCIA ============
+database "MySQL" as db
+
+' ============ SERVIÇOS EXTERNOS ============
+cloud "Email SMTP" as email
+cloud "QR Code" as qrcode
+
+' ====================================================
+' FLUXO 1: AUTENTICAÇÃO
+' ====================================================
+user -> frontend : "1: Login\n(email, senha)"
+frontend -> controllers : "2: POST /usuarios/login"
+controllers -> security : "3: Autenticar"
+security -> services : "4: Validar credenciais"
+services -> db : "5: Buscar usuário"
+db --> services : "6: Dados do usuário"
+services --> security : "7: UserDetails"
+security --> controllers : "8: JWT Token"
+controllers --> frontend : "9: Token + dados\ndo usuário"
+frontend --> user : "10: Login\nbem-sucedido"
+
+' ====================================================
+' FLUXO 2: ENVIO DE MOEDAS
+' ====================================================
+user -> frontend : "11: Enviar moedas\n(Professor → Aluno)"
+frontend -> controllers : "12: POST /transacoes"
+controllers -> services : "13: Processar\ntransação"
+services -> db : "14: Validar saldos"
+services -> db : "15: Atualizar saldos"
+services -> db : "16: Registrar transação"
+services -> email : "17: Enviar notificações"
+services --> controllers : "18: Transação criada"
+controllers --> frontend : "19: Sucesso"
+frontend --> user : "20: Confirmação"
+
+' ====================================================
+' FLUXO 3: RESGATE DE VANTAGEM
+' ====================================================
+user -> frontend : "21: Visualizar\nvantagens"
+frontend -> controllers : "22: GET /vantagens"
+controllers -> services : "23: Listar vantagens"
+services -> db : "24: Buscar vantagens"
+db --> services : "25: Lista de vantagens"
+services --> controllers : "26: Vantagens"
+controllers --> frontend : "27: Dados"
+frontend --> user : "28: Exibir vantagens"
+
+user -> frontend : "29: Resgatar\nvantagem"
+frontend -> controllers : "30: POST /transacoes/resgate"
+controllers -> services : "31: Processar resgate"
+services -> db : "32: Validar e debitar"
+services -> qrcode : "33: Gerar QR Code"
+qrcode --> services : "34: Imagem QR"
+services -> db : "35: Salvar transação"
+services -> email : "36: Enviar cupom"
+services --> controllers : "37: Cupom gerado"
+controllers --> frontend : "38: Dados do cupom"
+frontend --> user : "39: Exibir QR Code\ne código"
+
+' ====================================================
+' FLUXO 4: VALIDAÇÃO DE CUPOM
+' ====================================================
+user -> frontend : "40: Validar cupom\n(Empresa)"
+frontend -> controllers : "41: POST /transacoes/validar-cupom"
+controllers -> services : "42: Verificar cupom"
+services -> db : "43: Buscar e validar"
+services -> db : "44: Marcar como usado"
+services --> controllers : "45: Cupom validado"
+controllers --> frontend : "46: Sucesso"
+frontend --> user : "47: Confirmação"
+
+' ====================================================
+' FLUXO 5: GESTÃO DE CADASTROS
+' ====================================================
+user -> frontend : "48: Cadastrar\n(Aluno/Empresa/Vantagem)"
+frontend -> controllers : "49: POST /[recurso]"
+controllers -> services : "50: Criar registro"
+services -> db : "51: Inserir dados"
+db --> services : "52: Registro criado"
+services --> controllers : "53: Sucesso"
+controllers --> frontend : "54: Confirmação"
+frontend --> user : "55: Cadastro realizado"
+
+' ====================================================
+' NOTAS
+' ====================================================
+note right of user
+  <b>Perfis:</b>
+  • Administrador
+  • Professor
+  • Aluno
+  • Empresa Parceira
+end note
+
+note right of services
+  <b>Regras de Negócio:</b>
+  • Validação de saldos
+  • Cálculo de transações
+  • Geração de cupons únicos
+  • Controle de uso de cupons
+end note
+
+note right of db
+  <b>Entidades:</b>
+  • Usuario
+  • Aluno
+  • Professor
+  • EmpresaParceira
+  • Vantagem
+  • Transacao
+  • Instituicao
+end note
+@enduml
