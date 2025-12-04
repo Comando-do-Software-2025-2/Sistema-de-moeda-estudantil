@@ -132,3 +132,25 @@ spring.datasource.password=sua_senha
 spring.mail.host=smtp.gmail.com
 spring.mail.username=seu_email@gmail.com
 spring.mail.password=sua_senha_de_app
+````
+
+#### 2 Front-end (React, Vite)
+
+Crie um arquivo **`.env`** na raiz da pasta `/frontend` e use o prefixo `VITE_` (ou `REACT_APP_` se estiver usando CRA) para expor as variáveis ao *bundle* da aplicação.
+
+| Variável | Descrição | Exemplo |
+| :--- | :--- | :--- |
+| `VITE_API_URL` | URL base do endpoint do Backend Spring Boot. | `http://localhost:8080/api` |
+
+---
+
+### 🐳 Execução Local Completa com Docker Compose
+
+A maneira mais simples de rodar todo o ecossistema (Banco de Dados + Back-end + Front-end) é utilizando o Docker Compose.
+
+1. Certifique-se de que o **Docker** e o **Docker Compose** estão instalados e rodando.
+2. Navegue até a raiz do projeto (onde está o arquivo `docker-compose.yml`).
+3. Execute o seguinte comando no terminal:
+
+```bash
+docker-compose up --build
