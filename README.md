@@ -154,3 +154,91 @@ A maneira mais simples de rodar todo o ecossistema (Banco de Dados + Back-end + 
 
 ```bash
 docker-compose up --build
+````
+
+### ⚡ Como Executar Manualmente
+
+Caso prefira rodar os serviços individualmente em terminais separados (sem Docker para as aplicações), siga os passos abaixo.
+
+#### Pré-requisitos
+* **Java JDK 17+**: Necessário para executar o Back-end.
+* **Node.js 18+**: Necessário para executar o Front-end.
+* **Banco de Dados**: É necessário ter uma instância do **PostgreSQL** rodando localmente na porta `5432` com um banco de dados chamado `moeda_estudantil`.
+  * *Alternativa:* Caso não tenha o PostgreSQL instalado, você pode subir apenas o banco com Docker:
+    ```bash
+    docker run --name pg-moeda -e POSTGRES_PASSWORD=sua_senha -e POSTGRES_DB=moeda_estudantil -p 5432:5432 -d postgres:16
+    ```
+  * *Configuração:* Verifique se as credenciais no arquivo `Codigo/Back/sistema-de-moeda/src/main/resources/application.properties` correspondem ao seu banco local.
+
+---
+
+## 📂 Estrutura de Pastas
+
+Descreva o propósito das pastas principais.
+
+```
+.
+├── .gitignore                   # 🧹 Ignora arquivos/pastas não versionadas (.env, node_modules, target, etc.).
+├── .vscode/                     # ⚙️ Configurações de ambiente da IDE (opcional).
+├── .github/                     # 🤖 CI/CD (Actions), templates de Issues e Pull Requests.
+├── README.md                    # 📘 Documentação principal do projeto.
+├── CONTRIBUTING.md              # 🤝 Guia de contribuição.
+├── LICENSE                      # ⚖️ Licença do projeto.
+├── docker-compose.yml           # 🐳 Orquestração dos containers (front/back/db/etc).
+├── docker-compose.override.yml  # 🐳 Configurações extras apenas para desenvolvimento.
+│
+├── /frontend                    # 📁 Aplicação React
+│   ├── .env.example             # 🧩 Variáveis de ambiente do Front-end.
+│   ├── Dockerfile               # 🐳 Docker build do Front-end.
+│   ├── .eslintrc.js             # ✨ Regras do ESLint.
+│   ├── .prettierrc              # 🎨 Configuração do Prettier.
+│   ├── /public                  # 📂 Arquivos estáticos e index.html.
+│   ├── /src                     # 📂 Código-fonte React
+│   │   ├── /components          # 🧱 Componentes reutilizáveis (UI).
+│   │   ├── /pages               # 📄 Páginas/rotas da aplicação.
+│   │   ├── /services            # 🔌 Serviços e chamadas HTTP.
+│   │   ├── /hooks               # 🎣 Hooks personalizados.
+│   │   ├── /styles              # 🎨 Estilos globais, temas, Design System.
+│   │   ├── /assets              # 🖼️ Recursos estáticos importados
+│   │   │   ├── /images          # 🖼️ Imagens.
+│   │   │   ├── /icons           # 💡 Ícones.
+│   │   │   └── /fonts           # ✒️ Fontes personalizadas.
+│   │   └── /utils               # 🛠️ Funções utilitárias.
+│   ├── package.json             # 📦 Dependências e scripts.
+│   └── yarn.lock / package-lock.json # 🔒 Lockfile das dependências.
+│
+├── /backend                     # 📁 Aplicação Spring Boot
+│   ├── .env.example             # 🧩 Variáveis de ambiente do Back-end.
+│   ├── Dockerfile               # 🐳 Docker build do Back-end.
+│   │
+│   ├── /src/main/java           # 📂 Código-fonte Java
+│   │   └── /com/exemplo/sistema-de-moeda
+│   │       ├── /controller      # 🎮 Endpoints REST.
+│   │       ├── /service         # ⚙️ Regras e lógica de negócio.
+│   │       ├── /repository      # 🗄️ Repositórios (JPA/Hibernate).
+│   │       ├── /model           # 🧬 Entidades persistentes (JPA).
+│   │       ├── /email           # 📦 Template do e-mail a ser enviado, etc.
+│   │       ├── /enums           # 🌐 Classes do tipo enum.
+│   │       ├── /dto             # ✉️ Data Transfer Objects.
+│   │       ├── /config          # 🔧 Configurações gerais (DB, Swagger, CORS, etc.).
+│   │       ├── /exception       # 💥 Exceptions e handlers globais.
+│   │
+│   ├── /src/main/resources      # 📂 Recursos do Spring Boot
+│   │   ├── application.yml         # ⚙️ Configuração principal da aplicação
+│   │   ├── application-dev.yml     # 🧪 Configurações específicas do ambiente de DESENVOLVIMENTO
+│   │   ├── application-prod.yml    # 🚀 Configurações específicas para PRODUÇÃO
+│   │   ├── application-test.yml    # 🧪 Configurações usadas nos testes automatizados
+│   │   ├── /static                # 🌐 Arquivos estáticos (HTML/CSS/JS).
+│   │   ├── /templates             # 🖼️ Templates Thymeleaf/Freemarker.
+│   │
+│   ├── /src/test/java            # 🧪 Testes unitários e de integração.
+│   └── pom.xml / build.gradle    # 🛠️ Build e dependências.
+│
+├── /scripts                      # 📜 Scripts de automação
+│   ├── dev.sh                    # 🚀 Ambiente de desenvolvimento completo.
+│   ├── build_all.sh              # 🛠️ Build geral (front + back).
+│   └── deploy.sh                 # ☁️ Deploy em produção/homologação.
+│
+├── /docs                         # 📚 Documentação, arquitetura, modelos C4, Swagger/OpenAPI.
+└── /tests                        # 🧪 Testes End-to-End (Cypress/Playwright).
+```
