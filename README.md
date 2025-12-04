@@ -14,7 +14,6 @@
     </td>
     <td>
       <div align="center">
-        <img src="https://img.icons8.com/external-flaticons-lineal-color-flat-icons/64/external-scholarship-university-flaticons-lineal-color-flat-icons-2.png" alt="Logo do Projeto" width="120px"/>
       </div>
     </td>
   </tr>
