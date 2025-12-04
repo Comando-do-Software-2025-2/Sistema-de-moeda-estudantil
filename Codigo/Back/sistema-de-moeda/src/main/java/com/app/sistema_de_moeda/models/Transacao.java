@@ -39,6 +39,9 @@ public class Transacao {
     @JoinColumn(name = "vantagem_id")
     private Vantagem vantagem;
 
+    @Column(columnDefinition = "TEXT")
+    private String qrCodeBase64;
+
     @NotNull
     @Positive(message = "O valor da transação deve ser positivo")
     private BigDecimal valorEmMoedas;

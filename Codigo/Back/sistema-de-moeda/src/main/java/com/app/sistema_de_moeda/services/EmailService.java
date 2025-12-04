@@ -13,6 +13,9 @@ import org.thymeleaf.context.Context;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -85,7 +88,11 @@ public class EmailService {
             context.setVariable("codigoResgate", codigoResgate);
             context.setVariable("custoMoedas", custoMoedas);
             context.setVariable("nomeEmpresa", nomeEmpresa);
-            context.setVariable("fotoUrl", fotoUrl);
+
+            String qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data="
+                    + URLEncoder.encode(codigoResgate, StandardCharsets.UTF_8);
+
+            context.setVariable("qrCodeUrl", qrCodeUrl);
 
             String htmlContent = templateEngine.process("resgate-aluno-template", context);
 
