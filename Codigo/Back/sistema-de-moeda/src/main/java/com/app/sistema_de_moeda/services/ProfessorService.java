@@ -33,7 +33,7 @@ public class ProfessorService {
     }
 
     public Professor buscarProfessorPeloId(Long id) {
-        return professorRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Instituição não encontrada."));
+        return professorRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Professor não encontrado."));
     }
 
     public void criarProfessor(ProfessorDto professorDto) {
@@ -52,15 +52,16 @@ public class ProfessorService {
     }
 
     public List<Professor> buscarProfessores() {
-        List<Professor> professores = professorRepository.findAll();
-        if (professores.isEmpty()) {
-            throw new EntityNotFoundException("Não há instituições cadastradas");
-        }
-        return professores;
+        return professorRepository.findAll();
     }
 
     public void salvarProfessor(Professor professor) {
         professorRepository.save(professor);
+    }
+
+    public Professor buscarProfessorPorUsuarioId(Long usuarioId) {
+        return professorRepository.findByUsuarioId(usuarioId)
+                .orElseThrow(() -> new EntityNotFoundException("Professor não encontrado para o usuário com ID: " + usuarioId));
     }
 
 }

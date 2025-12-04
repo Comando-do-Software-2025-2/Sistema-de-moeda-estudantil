@@ -107,6 +107,9 @@
             <p>Estamos felizes em informar que você resgatou com sucesso uma vantagem! 🎉</p>
 
             <div class="vantagem-box">
+                <div th:if="${fotoUrl}" style="margin-bottom: 15px;">
+                    <img th:src="${fotoUrl}" alt="Vantagem" style="max-width: 100%; height: auto; border-radius: 4px; display: block;">
+                </div>
                 <div class="vantagem-title" th:text="${nomeVantagem}">Nome da Vantagem</div>
                 <p><strong>Empresa:</strong> <span th:text="${nomeEmpresa}">Nome da Empresa</span></p>
                 <p><strong>Custo:</strong> <span th:text="${custoMoedas}">50</span> moedas</p>
@@ -120,6 +123,14 @@
             <div class="alert">
                 <p><strong>⚠️ Importante:</strong> Apresente este código na empresa parceira para realizar seu resgate.</p>
                 <p style="margin-top: 10px;">O código é único e pode ser utilizado apenas uma vez.</p>
+            </div>
+
+            <div>
+                <h3>Apresente este QR Code na empresa</h3>
+                <img th:src="${qrCodeUrl}"
+                     width="250"
+                     alt="QR Code de Resgate"
+                     style="display: block; margin: 0 auto;"/>
             </div>
 
             <div class="info-box">

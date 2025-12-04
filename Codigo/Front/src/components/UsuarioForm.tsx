@@ -86,6 +86,7 @@ export function UsuarioForm() {
       console.log(payload);
 
       const response = await fetch(`${API_BASE_URL}/usuarios`, {
+        credentials: 'include',
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

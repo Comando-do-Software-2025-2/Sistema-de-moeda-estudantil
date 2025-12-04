@@ -68,7 +68,9 @@ export function AlunoForm() {
   useEffect(() => {
     const fetchInstituicoes = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/instituicoes`);
+        const res = await fetch(`${API_BASE_URL}/instituicoes`, {
+          credentials: 'include',
+        });
         if (!res.ok) throw new Error("Erro ao buscar instituições");
         const data = await res.json();
         setInstituicoes(data);
@@ -92,7 +94,9 @@ export function AlunoForm() {
     }
     setIsSearching(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/usuarios?search=${termo}&tipo=Aluno`);
+      const res = await fetch(`${API_BASE_URL}/usuarios?search=${termo}&tipo=Aluno`, {
+        credentials: 'include',
+      });
       if (!res.ok) throw new Error("Erro ao buscar usuários");
       const data = await res.json();
       setUsuarios(data);
@@ -140,6 +144,7 @@ export function AlunoForm() {
       console.log(payload);
 
       const response = await fetch(`${API_BASE_URL}/alunos`, {
+        credentials: 'include',
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

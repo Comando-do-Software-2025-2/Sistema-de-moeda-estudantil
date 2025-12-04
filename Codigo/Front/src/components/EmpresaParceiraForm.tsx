@@ -94,6 +94,7 @@ export function EmpresaParceiraForm() {
     try {
       // Envia os dados para o backend (POST)
       const response = await fetch("http://localhost:8080/empresas-parceiras", {
+        credentials: 'include',
         method: "POST",
         headers: {
           "Content-Type": "application/json",

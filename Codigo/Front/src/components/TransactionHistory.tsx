@@ -8,12 +8,12 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080
 interface Transacao {
   id: number;
   tipoTransacao: string;
-  professor: {
+  professor?: {
     id: number;
     usuario: {
       nome: string;
     };
-  };
+  } | null;
   aluno: {
     id: number;
     usuario: {
@@ -47,7 +47,9 @@ export function TransactionHistory() {
           setProfessorLogado(JSON.parse(professorData));
         }
 
-        const response = await fetch(`${API_BASE_URL}/transacoes`);
+        const response = await fetch(`${API_BASE_URL}/transacoes`, {
+          credentials: 'include',
+        });
         if (!response.ok) throw new Error('Erro ao buscar transações');
         
         const data = await response.json();
@@ -61,6 +63,20 @@ export function TransactionHistory() {
     };
 
     fetchTransacoes();
+
+    // Ouvir evento de transação realizada
+    const handleTransacaoRealizada = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const novaTransacao = customEvent.detail;
+      
+      setTransacoes(prev => [novaTransacao, ...prev]);
+    };
+
+    window.addEventListener('transacaoRealizada', handleTransacaoRealizada);
+
+    return () => {
+      window.removeEventListener('transacaoRealizada', handleTransacaoRealizada);
+    };
   }, []);
 
   if (isLoading) {
@@ -87,7 +103,7 @@ export function TransactionHistory() {
 
   // Filtrar apenas transações do professor logado
   const minhasTransacoes = professorLogado 
-    ? transacoes.filter(t => t.professor.id === professorLogado.id)
+    ? transacoes.filter(t => t.professor?.id === professorLogado.id)
     : transacoes;
 
   return (
@@ -112,14 +128,14 @@ export function TransactionHistory() {
                   </div>
                   <div>
                     <p className="text-white font-medium">
-                      Para: {transacao.aluno.usuario.nome}
+                      De: {transacao.professor?.usuario?.nome || 'Sistema'} → Para: {transacao.aluno.usuario.nome}
                     </p>
                     <p className="text-sm text-white/60 mt-1">{transacao.motivo}</p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="font-bold text-green-400 text-lg">
-                    +{transacao.valorEmMoedas}
+                    {transacao.valorEmMoedas}
                   </p>
                   <p className="text-white/60 text-xs">moedas</p>
                   <p className="text-xs text-white/50 mt-1">

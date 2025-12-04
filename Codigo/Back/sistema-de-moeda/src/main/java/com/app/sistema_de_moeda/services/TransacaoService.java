@@ -64,7 +64,33 @@ public class TransacaoService {
         transacao.setCodigoValidacao(UUID.randomUUID().toString());
         transacao.setDataTransacao(LocalDateTime.now());
 
-        return transacaoRepository.save(transacao);
+        Transacao savedTransacao = transacaoRepository.save(transacao);
+
+        // Enviar emails de notificação
+        try {
+            // Notifica aluno sobre recebimento de moedas
+            emailService.notificarAlunoDistribuicao(
+                    aluno.getUsuario().getNome(),
+                    aluno.getUsuario().getEmail(),
+                    professor.getUsuario().getNome(),
+                    valorMoedas.intValue(),
+                    moedasDto.motivo()
+            );
+
+            // Notifica professor sobre envio de moedas
+            emailService.notificarProfessorDistribuicao(
+                    professor.getUsuario().getNome(),
+                    professor.getUsuario().getEmail(),
+                    aluno.getUsuario().getNome(),
+                    valorMoedas.intValue(),
+                    moedasDto.motivo()
+            );
+        } catch (Exception e) {
+            System.err.println("Erro ao enviar emails de distribuição de moedas: " + e.getMessage());
+            // Não falha a transação se o email falhar
+        }
+
+        return savedTransacao;
     }
 
     // Buscar todas as transações
@@ -138,7 +164,8 @@ public class TransacaoService {
                     vantagem.getTitulo(),
                     codigo,
                     vantagem.getEmpresaParceira().getNomeEmpresa(),
-                    custo.intValue()
+                    custo.intValue(),
+                    vantagem.getFoto()
             );
 
             // Notify Company with correct email from the linked EmpresaParceira

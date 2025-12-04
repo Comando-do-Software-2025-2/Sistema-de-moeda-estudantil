@@ -32,6 +32,9 @@ public class Vantagem {
     @Column(length = 2048)
     private String foto; // URL opcional da imagem da vantagem
 
+    @Column(unique = true, length = 50)
+    private String codigoCupom; // Código único gerado ao resgatar
+
     @NotNull(message = "A empresa parceira é obrigatória")
     @ManyToOne(optional = false)
     @JoinColumn(name = "empresa_parceira_id", nullable = false)

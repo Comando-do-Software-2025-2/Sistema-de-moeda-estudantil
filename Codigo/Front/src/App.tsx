@@ -18,6 +18,7 @@ import Transactions from "./pages/Transactions";
 import CadastroVantagem from "./pages/CadastroVantagem";
 import HistoricoTransacoes from "./pages/HistoricoTransacoes";
 import Vantagens from "./pages/Vantagens";
+import TesteEmail from "./pages/TesteEmail";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<HomeAccess />} />
+            <Route path="/teste-email" element={<TesteEmail />} />
             
             {/* Rotas do Admin */}
             <Route

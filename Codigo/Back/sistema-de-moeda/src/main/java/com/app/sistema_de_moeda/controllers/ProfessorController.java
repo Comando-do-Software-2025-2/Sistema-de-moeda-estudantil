@@ -41,6 +41,11 @@ public class ProfessorController {
         return ResponseEntity.ok(professorService.buscarProfessorPeloId(id));
     }
 
+    @GetMapping("/usuario/{usuarioId}")
+    public ResponseEntity<Professor> buscarProfessorPorUsuarioId(@PathVariable Long usuarioId) {
+        return ResponseEntity.ok(professorService.buscarProfessorPorUsuarioId(usuarioId));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deletarProfessorPeloId(@PathVariable Long id) {
         professorService.deletarPeloId(id);

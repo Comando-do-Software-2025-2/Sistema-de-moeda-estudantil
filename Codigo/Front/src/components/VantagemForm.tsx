@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -7,9 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Gift, Coins, Image as ImageIcon, FileText } from "lucide-react";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+import { Gift, Coins, Image as ImageIcon, FileText, Building2 } from "lucide-react";
+import { apiClient } from "@/services/apiClient";
 
 const vantagemSchema = z.object({
   titulo: z.string().min(3, "Título deve ter no mínimo 3 caracteres").max(100, "Título muito longo"),
@@ -19,14 +18,26 @@ const vantagemSchema = z.object({
     return !isNaN(num) && num > 0;
   }, "Custo deve ser um número positivo"),
   foto: z.string().url("URL da foto inválida").optional().or(z.literal("")),
+  empresaParceiraId: z.string().refine((val) => {
+    const num = parseInt(val);
+    return !isNaN(num) && num > 0;
+  }, "Empresa parceira é obrigatória"),
 });
 
 type VantagemFormData = z.infer<typeof vantagemSchema>;
+
+interface EmpresaParceira {
+  id: number;
+  nomeEmpresa: string;
+  cnpj: string;
+}
 
 export function VantagemForm({ onSuccess }: { onSuccess?: () => void }) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewImage, setPreviewImage] = useState<string>("");
+  const [empresas, setEmpresas] = useState<EmpresaParceira[]>([]);
+  const [loadingEmpresas, setLoadingEmpresas] = useState(true);
 
   const {
     register,
@@ -40,12 +51,26 @@ export function VantagemForm({ onSuccess }: { onSuccess?: () => void }) {
 
   const fotoUrl = watch("foto");
 
-  // Atualizar preview quando URL mudar
-  useState(() => {
-    if (fotoUrl && fotoUrl.startsWith("http")) {
-      setPreviewImage(fotoUrl);
-    }
-  });
+  // Carregar empresas ao montar
+  useEffect(() => {
+    const carregarEmpresas = async () => {
+      try {
+        const data = await apiClient.get<EmpresaParceira[]>("/empresas-parceiras");
+        setEmpresas(data);
+      } catch (error) {
+        console.error("Erro ao carregar empresas:", error);
+        toast({
+          title: "Erro ao carregar empresas",
+          description: "Verifique se há empresas cadastradas",
+          variant: "destructive",
+        });
+      } finally {
+        setLoadingEmpresas(false);
+      }
+    };
+
+    carregarEmpresas();
+  }, []);
 
   const onSubmit = async (data: VantagemFormData) => {
     setIsSubmitting(true);
@@ -53,25 +78,17 @@ export function VantagemForm({ onSuccess }: { onSuccess?: () => void }) {
       const payload = {
         titulo: data.titulo,
         descricao: data.descricao,
-        custoMoedas: parseFloat(data.custoMoedas),
+        custoEmMoedas: parseFloat(data.custoMoedas),
         foto: data.foto || null,
+        empresaParceiraId: parseInt(data.empresaParceiraId),
       };
 
       console.log("Enviando vantagem:", payload);
 
-      const response = await fetch(`${API_BASE_URL}/vantagens`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || "Erro ao cadastrar vantagem");
-      }
+      await apiClient.post("/vantagens", payload);
 
       toast({
-        title: "Vantagem cadastrada!",
+        title: "✅ Vantagem cadastrada!",
         description: "A vantagem foi cadastrada com sucesso no sistema.",
       });
       reset();
@@ -79,7 +96,7 @@ export function VantagemForm({ onSuccess }: { onSuccess?: () => void }) {
       if (onSuccess) onSuccess();
     } catch (error) {
       toast({
-        title: "Erro ao cadastrar vantagem",
+        title: "❌ Erro ao cadastrar vantagem",
         description: error instanceof Error ? error.message : "Verifique os dados e tente novamente.",
         variant: "destructive",
       });
@@ -99,6 +116,33 @@ export function VantagemForm({ onSuccess }: { onSuccess?: () => void }) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 w-full max-w-2xl">
+      {/* Empresa Parceira */}
+      <div className="space-y-2">
+        <Label className="text-white flex items-center gap-2">
+          <Building2 className="h-4 w-4" />
+          Empresa Parceira *
+        </Label>
+        <select
+          {...register("empresaParceiraId")}
+          className="w-full bg-white/30 text-white border border-white/20 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400 disabled:opacity-50"
+          disabled={loadingEmpresas}
+        >
+          <option value="">
+            {loadingEmpresas ? "Carregando empresas..." : "Selecione uma empresa"}
+          </option>
+          {empresas.map((empresa) => (
+            <option key={empresa.id} value={empresa.id}>
+              {empresa.nomeEmpresa}
+            </option>
+          ))}
+        </select>
+        {errors.empresaParceiraId && (
+          <p className="text-red-300 text-sm flex items-center gap-1">
+            <span className="text-red-400">⚠</span> {errors.empresaParceiraId.message}
+          </p>
+        )}
+      </div>
+
       {/* Título */}
       <div className="space-y-2">
         <Label className="text-white flex items-center gap-2">
@@ -211,7 +255,7 @@ export function VantagemForm({ onSuccess }: { onSuccess?: () => void }) {
       <Button
         type="submit"
         className="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-black font-semibold py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
-        disabled={isSubmitting}
+        disabled={isSubmitting || loadingEmpresas}
       >
         {isSubmitting ? (
           <span className="flex items-center gap-2">

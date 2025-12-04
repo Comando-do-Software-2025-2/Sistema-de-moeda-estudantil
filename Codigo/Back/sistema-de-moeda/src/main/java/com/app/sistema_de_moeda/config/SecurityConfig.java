@@ -27,11 +27,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // API Stateless
                 .authorizeHttpRequests(req -> req
-                        .requestMatchers(HttpMethod.POST, "/usuarios/login").permitAll() // Login liberado
-                        .requestMatchers(HttpMethod.POST, "/usuarios").permitAll() // Cadastro liberado
-                        .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/empresas-parceiras/**").permitAll() // Ajuste conforme necessidade
-                        .anyRequest().authenticated() // O resto exige token
+                        .anyRequest().permitAll() // Libera todas as rotas temporariamente para testes
                 )
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

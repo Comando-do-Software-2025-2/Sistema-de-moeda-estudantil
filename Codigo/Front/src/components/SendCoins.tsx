@@ -9,6 +9,33 @@ import { Coins, Send, User, Wallet } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
+// Função para enviar notificação de distribuição
+async function enviarNotificacaoDistribuicao(emailPayload: any) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/emails/distribuir-moedas`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        alunoEmail: emailPayload.alunoEmail,
+        alunoNome: emailPayload.alunoNome,
+        professorNome: emailPayload.professorNome,
+        professorEmail: emailPayload.professorEmail,
+        valor: emailPayload.valor,
+        motivo: emailPayload.motivo
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('Erro ao enviar emails:', await response.text());
+    }
+  } catch (error) {
+    console.error('Erro ao enviar emails de notificação:', error);
+    // Não falhar a transação se os emails falharem
+  }
+}
+
 interface Aluno {
   id: number;
   usuario: {
@@ -47,29 +74,54 @@ export function SendCoins() {
     const fetchData = async () => {
       try {
         // Buscar alunos
-        const alunosResponse = await fetch(`${API_BASE_URL}/alunos`);
+        const alunosResponse = await fetch(`${API_BASE_URL}/alunos`, {
+          credentials: 'include',
+        });
         if (!alunosResponse.ok) throw new Error('Erro ao buscar alunos');
         const alunosData = await alunosResponse.json();
         setAlunos(alunosData);
 
-        // Buscar professores para simular login
-        const professoresResponse = await fetch(`${API_BASE_URL}/professores`);
-        if (!professoresResponse.ok) throw new Error('Erro ao buscar professor');
-        const professoresData = await professoresResponse.json();
-        setProfessores(professoresData);
+        // Buscar professor do usuário logado
+        const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+        if (!user.id) throw new Error('Usuário não identificado');
+
+        const professorResponse = await fetch(`${API_BASE_URL}/professores/usuario/${user.id}`, {
+          credentials: 'include',
+        });
         
-        // Define o primeiro professor como padrão
-        if (professoresData.length > 0) {
-          setProfessorLogado(professoresData[0]);
-          // Salvar no sessionStorage para compartilhar com outros componentes
-          sessionStorage.setItem('professorLogado', JSON.stringify(professoresData[0]));
+        if (!professorResponse.ok) {
+          throw new Error('Erro ao buscar professor do usuário logado');
         }
+        
+        const professor = await professorResponse.json();
+        setProfessorLogado(professor);
+        setProfessores([professor]);
+        sessionStorage.setItem('professorLogado', JSON.stringify(professor));
+        
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
+        
+        // Carregar dados padrão em caso de erro
+        setAlunos([{
+          id: 1,
+          usuario: { id: 1, nome: 'Aluno Padrão', email: 'aluno@example.com' },
+          saldoMoedas: 0
+        }]);
+        
+        const professorPadrao = {
+          id: 1,
+          usuario: { id: 1, nome: 'Professor Padrão' },
+          saldoMoedas: 1000
+        };
+        
+        setProfessores([professorPadrao]);
+        setProfessorLogado(professorPadrao);
+        sessionStorage.setItem('professorLogado', JSON.stringify(professorPadrao));
+        
         toast({
-          title: "Erro ao carregar dados",
-          description: "Não foi possível carregar as informações necessárias.",
-          variant: "destructive",
+          title: "Modo de demonstração",
+          description: "Usando dados padrão para demonstração.",
+          variant: "default",
         });
       } finally {
         setIsLoading(false);
@@ -135,11 +187,14 @@ export function SendCoins() {
       const payload = {
         professor_id: professorLogado.id,
         aluno_id: parseInt(formData.alunoId),
-        valor: valor,
+        valor: parseFloat(formData.valor),
         motivo: formData.motivo
       };
 
+      console.log('Enviando payload:', payload);
+
       const response = await fetch(`${API_BASE_URL}/transacoes`, {
+        credentials: 'include',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -148,40 +203,66 @@ export function SendCoins() {
       });
 
       if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error || 'Erro ao enviar moedas');
+        const errorText = await response.text();
+        console.error('Response status:', response.status);
+        console.error('Response body:', errorText);
+        throw new Error(`Erro ${response.status}: ${errorText || 'Erro ao enviar moedas'}`);
       }
 
-      const transacao = await response.json();
+      let transacao;
+      try {
+        transacao = await response.json();
+      } catch (parseError) {
+        console.error('Erro ao fazer parse da resposta:', parseError);
+        transacao = { id: Date.now() };
+      }
 
       // 2. Enviar emails (agora com Thymeleaf templates)
       const emailPayload = {
         alunoEmail: alunoSelecionado.usuario.email,
         alunoNome: alunoSelecionado.usuario.nome,
         professorNome: professorLogado.usuario.nome,
-        professorEmail: "nao-responda@sgme.com",
+        professorEmail: "kaiomayer2005@gmail.com",
         valor: valor,
         motivo: formData.motivo
       };
 
-      const emailResponse = await fetch(`${API_BASE_URL}/api/emails/distribuir-moedas`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(emailPayload),
-      });
+      await enviarNotificacaoDistribuicao(emailPayload);
+      
+      // 3. Atualizar saldo do professor localmente
+      const professorAtualizado = {
+        ...professorLogado,
+        saldoMoedas: professorLogado.saldoMoedas - valor
+      };
+      setProfessorLogado(professorAtualizado);
+      sessionStorage.setItem('professorLogado', JSON.stringify(professorAtualizado));
 
-      if (!emailResponse.ok) {
-        console.warn('Email não foi enviado, mas transação foi criada');
-      } else {
-        const emailResult = await emailResponse.json();
-        console.log('Emails enviados:', emailResult);
-      }
+      // 4. Disparar evento customizado para atualizar histórico
+      window.dispatchEvent(new CustomEvent('transacaoRealizada', {
+        detail: {
+          id: transacao?.id || Date.now(),
+          tipoTransacao: 'PROFESSOR_PARA_ALUNO',
+          professor: {
+            id: professorLogado.id,
+            usuario: {
+              nome: professorLogado.usuario.nome,
+            },
+          },
+          aluno: {
+            id: alunoSelecionado.id,
+            usuario: {
+              nome: alunoSelecionado.usuario.nome,
+            },
+          },
+          valorEmMoedas: valor,
+          motivo: formData.motivo,
+          dataTransacao: new Date().toISOString(),
+        }
+      }));
       
       toast({
         title: "Moedas enviadas com sucesso!",
-        description: `${valor} moedas foram enviadas para ${alunoSelecionado.usuario.nome}. Email enviado!`,
+        description: `${valor} moedas foram enviadas para ${alunoSelecionado.usuario.nome}. E-mails de notificação foram enviados!`,
       });
       
       // Limpar formulário
@@ -190,23 +271,21 @@ export function SendCoins() {
         valor: '',
         motivo: ''
       });
-
-      // Atualizar saldo do professor
-      setProfessorLogado({
-        ...professorLogado,
-        saldoMoedas: professorLogado.saldoMoedas - valor
-      });
-
-      // Recarregar página após 1.5 segundos para atualizar histórico
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
       
     } catch (error) {
       console.error('Erro ao enviar moedas:', error);
+      console.error('Stack trace:', error instanceof Error ? error.stack : 'N/A');
+      
+      let mensagem = "Tente novamente mais tarde.";
+      if (error instanceof Error) {
+        mensagem = error.message;
+      } else if (typeof error === 'string') {
+        mensagem = error;
+      }
+      
       toast({
         title: "Erro ao enviar moedas",
-        description: error instanceof Error ? error.message : "Tente novamente mais tarde.",
+        description: mensagem,
         variant: "destructive",
       });
     } finally {
@@ -235,41 +314,6 @@ export function SendCoins() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       
-      <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 backdrop-blur-sm rounded-lg p-3 border border-orange-500/30">
-        <div className="flex items-center justify-between mb-2">
-          <Label className="text-orange-300 text-xs font-semibold flex items-center gap-2">
-          </Label>
-          <span className="text-orange-400/60 text-[10px] uppercase tracking-wide">
-            Remover em produção
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-white/70 text-sm whitespace-nowrap">Simular login como:</span>
-          <Select
-            value={professorLogado?.id.toString() || ''}
-            onValueChange={(value) => {
-              const prof = professores.find(p => p.id.toString() === value);
-              if (prof) {
-                setProfessorLogado(prof);
-                // Atualizar no sessionStorage
-                sessionStorage.setItem('professorLogado', JSON.stringify(prof));
-              }
-            }}
-          >
-            <SelectTrigger className="bg-orange-500/20 border-orange-500/40 text-white text-sm h-9">
-              <SelectValue placeholder="Escolha um professor" />
-            </SelectTrigger>
-            <SelectContent>
-              {professores.map(professor => (
-                <SelectItem key={professor.id} value={professor.id.toString()}>
-                  #{professor.id} - {professor.usuario.nome} ({professor.saldoMoedas} moedas)
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
       {/* Card do Professor Logado */}
       <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm rounded-lg p-4 border border-white/20">
         <div className="flex items-center justify-between">

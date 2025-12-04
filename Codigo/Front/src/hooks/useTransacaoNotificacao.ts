@@ -39,7 +39,9 @@ export function useTransacaoNotificacao(
 
     const monitorarTransacoes = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/transacoes/aluno/${alunoId}`);
+        const response = await fetch(`${API_BASE_URL}/transacoes/aluno/${alunoId}`, {
+          credentials: 'include',
+        });
         if (!response.ok) return;
 
         const transacoes: Transacao[] = await response.json();

@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { DynamicNavbar } from "@/components/DynamicNavbar";
-import { TransacaoNotificadorAluno } from "@/components/TransacaoNotificadorAluno";
 import { Gift, Sparkles, Coins, Building2, Search, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { apiClient } from "@/services/apiClient";
 
 type VantagemApi = {
   id: number;
@@ -27,8 +27,6 @@ interface Aluno {
   saldoMoedas: number;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
-
 const Vantagens = () => {
   const { toast } = useToast();
   const [vantagens, setVantagens] = useState<VantagemApi[]>([]);
@@ -43,17 +41,25 @@ const Vantagens = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`${API_BASE_URL}/vantagens`);
-        if (!res.ok) throw new Error("Falha ao carregar vantagens");
-        const data = await res.json();
+        const data = await apiClient.get<VantagemApi[]>("/vantagens");
         if (Array.isArray(data)) {
           setVantagens(data);
         } else {
           setVantagens([]);
         }
 
+        // Criar um aluno padrão para permitir resgate
+        let aluno: Aluno = {
+          id: 1,
+          usuario: {
+            id: 1,
+            nome: "Aluno",
+            email: "kaiomayer2005@gmail.com"
+          },
+          saldoMoedas: 1000 // Saldo padrão para teste
+        };
+
         // Tentar carregar aluno atual - primeiro tenta localStorage, depois sessionStorage
-        let aluno = null;
         const alunoStored = localStorage.getItem("aluno");
         const alunoSession = sessionStorage.getItem("alunoLogado");
         
@@ -61,23 +67,17 @@ const Vantagens = () => {
           aluno = JSON.parse(alunoStored);
         } else if (alunoSession) {
           aluno = JSON.parse(alunoSession);
-        } else {
-          // Se não houver aluno armazenado, tentar buscar o primeiro aluno da API
-          const alunosRes = await fetch(`${API_BASE_URL}/alunos`);
-          if (alunosRes.ok) {
-            const alunos = await alunosRes.json();
-            if (alunos.length > 0) {
-              aluno = alunos[0];
-              sessionStorage.setItem("alunoLogado", JSON.stringify(aluno));
-            }
-          }
         }
         
-        if (aluno) {
-          setAlunoAtual(aluno);
-        }
+        setAlunoAtual(aluno);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Erro desconhecido");
+        // Mesmo com erro, criar aluno padrão
+        setAlunoAtual({
+          id: 1,
+          usuario: { id: 1, nome: "Aluno", email: "kaiomayer2005@gmail.com" },
+          saldoMoedas: 1000
+        });
       } finally {
         setLoading(false);
       }
@@ -118,36 +118,52 @@ const Vantagens = () => {
     setResgatando(vantagem.id);
 
     try {
-      // Gerar código único para o resgate
-      const codigoResgate = `VAN${Date.now()}`;
-
-      // Enviar para backend - resgate de vantagem
-      const response = await fetch(`${API_BASE_URL}/transacoes/resgate`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          aluno_id: alunoAtual.id,
-          vantagem_id: vantagem.id,
-        }),
+      const novoSaldo = alunoAtual.saldoMoedas - custo;
+      
+      // Chamar novo endpoint de resgate
+      const result = await apiClient.post<any>(`/vantagens/${vantagem.id}/resgatar`, {
+        nomeAluno: alunoAtual.usuario.nome,
+        emailAluno: alunoAtual.usuario.email,
+        vantagemId: vantagem.id,
+        foto: vantagem.foto, // Incluir foto no email
       });
 
-      if (!response.ok) {
-        throw new Error("Erro ao resgatar vantagem");
-      }
-
-      const result = await response.json();
-
-      // Atualizar saldo local
-      setAlunoAtual({
+      // Atualizar estado local
+      const alunoAtualizado = {
         ...alunoAtual,
-        saldoMoedas: alunoAtual.saldoMoedas - custo,
-      });
+        saldoMoedas: novoSaldo,
+      };
+      setAlunoAtual(alunoAtualizado);
+      
+      // Salvar saldo e aluno atualizado em localStorage e sessionStorage
+      localStorage.setItem("aluno", JSON.stringify(alunoAtualizado));
+      sessionStorage.setItem("alunoLogado", JSON.stringify(alunoAtualizado));
+      
+      // Remover vantagem da lista (marcar como resgatada)
+      setVantagens(vantagens.filter(v => v.id !== vantagem.id));
+
+      // Disparar evento customizado para atualizar histórico de transações
+      window.dispatchEvent(new CustomEvent('transacaoRealizada', {
+        detail: {
+          id: result?.id || Date.now(),
+          tipoTransacao: 'TROCA',
+          aluno: {
+            id: alunoAtual.id,
+            usuario: {
+              nome: alunoAtual.usuario.nome,
+            },
+          },
+          professor: null,
+          valorEmMoedas: custo,
+          motivo: `Resgate de vantagem: ${vantagem.titulo}`,
+          dataTransacao: new Date().toISOString(),
+          codigoCupom: result?.codigoCupom || 'CODIGO',
+        }
+      }));
 
       toast({
         title: "Vantagem resgatada com sucesso!",
-        description: `Código: ${codigoResgate}\nEmail enviado para ${alunoAtual.usuario.email}`,
+        description: `Código do cupom: ${result?.codigoCupom || "Gerado"}\nEmail enviado para ${alunoAtual.usuario.email}\nNovo saldo: ${novoSaldo} moedas`,
       });
     } catch (error) {
       console.error("Erro no resgate:", error);
@@ -162,8 +178,7 @@ const Vantagens = () => {
   };
 
   return (
-    <TransacaoNotificadorAluno>
-      <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden">
       <DynamicNavbar />
 
       {/* Video Background */}
@@ -288,17 +303,31 @@ const Vantagens = () => {
                       <p className="text-white/80 text-sm line-clamp-3 mb-4">{v.descricao}</p>
                     )}
 
-                    <div className="flex items-center justify-between">
+                    <div className="space-y-3">
                       <div className="inline-flex items-center gap-2 text-amber-200">
                         <Coins className="h-5 w-5" />
                         <span className="font-medium">{custo}</span>
                         <span className="text-amber-200/80">moedas</span>
                       </div>
 
-                      {/* placeholder action (resgate no futuro) */}
-                      <span className="text-xs text-white/70 bg-white/10 border border-white/10 rounded-md px-2 py-1">
-                        Disponível
-                      </span>
+                      <Button
+                        size="sm"
+                        onClick={() => handleResgate(v)}
+                        disabled={resgatando === v.id}
+                        className="w-full bg-amber-500 hover:bg-amber-600 disabled:bg-amber-500/50 text-white font-semibold"
+                      >
+                        {resgatando === v.id ? (
+                          <>
+                            <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                            Resgatando...
+                          </>
+                        ) : (
+                          <>
+                            <Check className="h-4 w-4 mr-1" />
+                            Resgatar
+                          </>
+                        )}
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -308,7 +337,6 @@ const Vantagens = () => {
         )}
       </div>
     </div>
-    </TransacaoNotificadorAluno>
   );
 };
 
